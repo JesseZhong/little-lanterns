@@ -1,0 +1,65 @@
+[gd_scene load_steps=12 format=3 uid="uid://y1udmrageamr"]
+
+[ext_resource type="Texture2D" uid="uid://dt0byejrbf65u" path="res://sprites/Monster/animation/1.png" id="1_gfurk"]
+[ext_resource type="Script" uid="uid://dlf4gt57jymsf" path="res://mob.gd" id="1_ieysi"]
+[ext_resource type="Texture2D" uid="uid://bs1jq244ysau7" path="res://sprites/Monster/animation/2.png" id="2_ieysi"]
+[ext_resource type="Texture2D" uid="uid://dcckpx0jb73wv" path="res://sprites/Monster/animation/3.png" id="3_cixyi"]
+[ext_resource type="Texture2D" uid="uid://c3o0e3nvpted1" path="res://sprites/Monster/animation/4.png" id="4_7ulmv"]
+[ext_resource type="Texture2D" uid="uid://bog5u0jatsyqm" path="res://sprites/Monster/animation/5.png" id="5_pcqmr"]
+[ext_resource type="Texture2D" uid="uid://d3u3aqs1kx74l" path="res://sprites/Monster/animation/6.png" id="6_jbnni"]
+[ext_resource type="Texture2D" uid="uid://d1sq0cc0rfd8u" path="res://sprites/Monster/animation/7.png" id="7_yscv0"]
+[ext_resource type="Texture2D" uid="uid://bfg1x4gwy1clj" path="res://sprites/Monster/animation/8.png" id="8_eqsov"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_wvrms"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_gfurk")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_ieysi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_cixyi")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_7ulmv")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_pcqmr")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_jbnni")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_yscv0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_eqsov")
+}],
+"loop": true,
+"name": &"default",
+"speed": 5.0
+}]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gfurk"]
+radius = 34.0
+
+[node name="Mob" type="RigidBody2D" groups=["mobs"]]
+collision_mask = 0
+gravity_scale = 0.0
+script = ExtResource("1_ieysi")
+metadata/_edit_group_ = true
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(5, 5)
+sprite_frames = SubResource("SpriteFrames_wvrms")
+frame = 2
+frame_progress = 0.35060403
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_gfurk")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
