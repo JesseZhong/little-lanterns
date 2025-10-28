@@ -1,7 +1,7 @@
 [gd_scene load_steps=48 format=3 uid="uid://dj7iwbb647t6n"]
 
 [ext_resource type="Texture2D" uid="uid://bq80n0kcccjuv" path="res://sprites/Hero/idle/1.png" id="1_3fhje"]
-[ext_resource type="Script" uid="uid://div5t4qowj5nf" path="res://character.gd" id="1_hkojd"]
+[ext_resource type="Script" uid="uid://div5t4qowj5nf" path="res://characters/character.gd" id="1_hkojd"]
 [ext_resource type="Texture2D" uid="uid://b87ex2j8u7r0" path="res://sprites/Hero/idle/2.png" id="2_0a77e"]
 [ext_resource type="Texture2D" uid="uid://mxmhqslt6h4x" path="res://sprites/Hero/idle/3.png" id="3_hkojd"]
 [ext_resource type="Texture2D" uid="uid://bnac2w26wxi8o" path="res://sprites/Hero/idle/4.png" id="4_ltcw0"]
