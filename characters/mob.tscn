@@ -1,7 +1,7 @@
 [gd_scene load_steps=12 format=3 uid="uid://y1udmrageamr"]
 
 [ext_resource type="Texture2D" uid="uid://dt0byejrbf65u" path="res://sprites/Monster/animation/1.png" id="1_gfurk"]
-[ext_resource type="Script" uid="uid://dlf4gt57jymsf" path="res://mob.gd" id="1_ieysi"]
+[ext_resource type="Script" uid="uid://dlf4gt57jymsf" path="res://characters/mob.gd" id="1_ieysi"]
 [ext_resource type="Texture2D" uid="uid://bs1jq244ysau7" path="res://sprites/Monster/animation/2.png" id="2_ieysi"]
 [ext_resource type="Texture2D" uid="uid://dcckpx0jb73wv" path="res://sprites/Monster/animation/3.png" id="3_cixyi"]
 [ext_resource type="Texture2D" uid="uid://c3o0e3nvpted1" path="res://sprites/Monster/animation/4.png" id="4_7ulmv"]

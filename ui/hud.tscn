@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://dtq8oq47710lr"]
 
-[ext_resource type="Script" uid="uid://ba3nubsmewtex" path="res://hud.gd" id="1_37p78"]
+[ext_resource type="Script" uid="uid://ba3nubsmewtex" path="res://ui/hud.gd" id="1_37p78"]
 
 [sub_resource type="SystemFont" id="SystemFont_n2snw"]
 

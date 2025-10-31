@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=3 uid="uid://dub4qgugsvap8"]
 
-[ext_resource type="Script" uid="uid://b502j4ye354it" path="res://terrain_tile.gd" id="1_14ndr"]
+[ext_resource type="Script" uid="uid://b502j4ye354it" path="res://map/terrain_tile.gd" id="1_14ndr"]
 [ext_resource type="Texture2D" uid="uid://51d7c6u5j7c" path="res://sprites/Tiles/terrain/grass.png" id="2_8jesh"]
 [ext_resource type="Texture2D" uid="uid://b7jlrbjkfnevj" path="res://sprites/Tiles/terrain/earth.png" id="3_f82c6"]
 

@@ -1,0 +1,83 @@
+[gd_scene format=3 uid="uid://b763lmxuy7jd3"]
+
+[node name="Stats" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="TabContainer" type="TabContainer" parent="."]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+current_tab = 1
+use_hidden_tabs_for_min_size = true
+
+[node name="Basic" type="MarginContainer" parent="TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+metadata/_tab_index = 0
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/Basic"]
+clip_contents = true
+layout_mode = 2
+columns = 2
+
+[node name="AttackLabel" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "Attack"
+
+[node name="AttackText" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="RunSpeedLabel" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "Run Speed"
+
+[node name="RunSpeedText" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="SwimSpeedLabel" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "Swim Speed"
+
+[node name="SwimSpeedText" type="Label" parent="TabContainer/Basic/GridContainer"]
+layout_mode = 2
+text = "0"
+
+[node name="Elements" type="MarginContainer" parent="TabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 14
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 26
+metadata/_tab_index = 1
+
+[node name="GridContainer" type="GridContainer" parent="TabContainer/Elements"]
+layout_mode = 2
+
+[node name="DamagesLabel" type="Label" parent="TabContainer/Elements/GridContainer"]
+layout_mode = 2
+text = "Damages"
+
+[node name="DamagesContainer" type="GridContainer" parent="TabContainer/Elements/GridContainer"]
+layout_mode = 2
+columns = 2
+
+[node name="FireLabel" type="Label" parent="TabContainer/Elements/GridContainer/DamagesContainer"]
+layout_mode = 2
+text = "Fire"
+
+[node name="ResistancesLabel" type="Label" parent="TabContainer/Elements/GridContainer"]
+layout_mode = 2
+text = "Resistances"
+
+[node name="ResistancesContainer" type="GridContainer" parent="TabContainer/Elements/GridContainer"]
+layout_mode = 2
