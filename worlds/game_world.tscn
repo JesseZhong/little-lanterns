@@ -1,0 +1,16 @@
+[gd_scene load_steps=4 format=3 uid="uid://cplf16bfr5vwy"]
+
+[ext_resource type="PackedScene" uid="uid://dmde4y4713ycx" path="res://controllers/player.tscn" id="1_4736o"]
+[ext_resource type="Script" uid="uid://bddt2r0jksorp" path="res://worlds/game_world.gd" id="1_fwdc2"]
+[ext_resource type="PackedScene" uid="uid://bbdj6dehqn7am" path="res://characters/novice.tscn" id="2_fwdc2"]
+
+[node name="GameWorld" type="Node2D"]
+script = ExtResource("1_fwdc2")
+
+[node name="Player" parent="." instance=ExtResource("1_4736o")]
+z_index = 12
+character_scene = ExtResource("2_fwdc2")
+start_position = Vector2(20, 10)
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(4, 4)

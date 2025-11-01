@@ -1,0 +1,39 @@
+start out as a novice
+complete quests on map to unlock different jobs
+  some overlap between jobs
+  promotions show up on a wheel after reaching min level
+  quests unlock in journal permanently after first time
+complete quests to unlock different types of gear
+map is generated with points of interest per run
+can recruit npc buddies to help you?
+
+monster AI
+  will change strategy if hit enough times within a short period
+    ex.
+      losing a lot of health with a lot of hits in a short time causes it to be defensive
+      player is close to death, trigger aggression or trade strats
+      barrage of hits connect, but low damage: triggers riskier strats
+        landing hits with high % damage: trigger frequency
+        player heals: rush consecutive hits
+        
+    each AI has a reaction speed stat
+      under the hood its the interval between snapshots taken of the world
+        snapshots include current target(s) and self position, equipment, velocity, aim (prediction - normdist arc angle)
+        calculate wait time before next snapshot
+          normal distribution
+
+    each AI has a commit speed stat
+      under the hood its the time between deciding a strat then acting on it
+      normal distribution
+      
+    after choosing a strat, set a minimal time to maintain it
+      then a percent chance to maintain and percentages of changing to other strats
+      roll
+
+
+camera
+  zoom with mouse
+      
+      
+tooling
+  linting
