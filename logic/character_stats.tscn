@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://76njg0qf6iox"]
+
+[ext_resource type="Script" uid="uid://783d0g42c4h" path="res://logic/character_stats.gd" id="1_ndqo4"]
+
+[node name="CharacterStats" type="Node"]
+script = ExtResource("1_ndqo4")
