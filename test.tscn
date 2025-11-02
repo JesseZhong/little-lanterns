@@ -1,20 +1,24 @@
-[gd_scene load_steps=5 format=3 uid="uid://bd8nmsvo57gue"]
+[gd_scene load_steps=6 format=3 uid="uid://bd8nmsvo57gue"]
 
 [ext_resource type="PackedScene" uid="uid://dmde4y4713ycx" path="res://controllers/player.tscn" id="1_8uh7m"]
 [ext_resource type="Script" uid="uid://bhmu0od6skaex" path="res://test.gd" id="1_ppyta"]
 [ext_resource type="PackedScene" uid="uid://bbdj6dehqn7am" path="res://characters/novice.tscn" id="2_6uqi0"]
 [ext_resource type="PackedScene" uid="uid://doof4ltuwdmuc" path="res://map/test_map.tscn" id="3_6uqi0"]
+[ext_resource type="PackedScene" uid="uid://biqsul6dsnor1" path="res://controllers/orc_ai.tscn" id="5_ykrsh"]
 
 [node name="Test" type="Node2D"]
+y_sort_enabled = true
 script = ExtResource("1_ppyta")
 
 [node name="Player" parent="." instance=ExtResource("1_8uh7m")]
-z_index = 12
 character_scene = ExtResource("2_6uqi0")
-start_position = Vector2(20, 10)
+current_position = Vector2(20, 10)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(4, 4)
 
 [node name="TestMap" parent="." instance=ExtResource("3_6uqi0")]
 position = Vector2(-200, -100)
+
+[node name="OrcAI" parent="." instance=ExtResource("5_ykrsh")]
+current_position = Vector2(30, 10)

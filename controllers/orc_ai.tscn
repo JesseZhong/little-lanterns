@@ -1,0 +1,8 @@
+[gd_scene load_steps=3 format=3 uid="uid://biqsul6dsnor1"]
+
+[ext_resource type="Script" uid="uid://f4trwljguub6" path="res://controllers/orc_ai.gd" id="1_3reha"]
+[ext_resource type="PackedScene" uid="uid://qtov7chcubyb" path="res://characters/orc.tscn" id="2_5pq7k"]
+
+[node name="OrcAI" type="Node2D"]
+script = ExtResource("1_3reha")
+character_scene = ExtResource("2_5pq7k")

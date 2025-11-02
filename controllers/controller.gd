@@ -1,15 +1,23 @@
 @abstract class_name Controller
-extends Node
+extends Node2D
 
 @export var character_scene: PackedScene
-@export var start_position: Vector2 = Vector2.ZERO
 var character: Character2D
 
-var current_position:
+@export
+var current_position: Vector2 = Vector2.ZERO:
   get:
-    return character.position if character else Vector2.ZERO
+    return character.current_position \
+      if character \
+      else Vector2.ZERO
+  set(value):
+    if character:
+      character.current_position = value
 
 func _ready() -> void:
   character = character_scene.instantiate()
-  character.position = start_position
   add_child(character)
+  
+  # Enable Y-Sorting to draw furthest characters first.
+  y_sort_enabled = true
+  

@@ -1,10 +1,10 @@
 extends Character2D
 
-func heavy_attack(delta: float):
-  var direction = calc_face_direction(velocity)
+func heavy_attack(_delta: float):
+  var direction = calc_face_direction(move_velocity)
   smooth_play('heavy_attack_%s' % direction)
 
-func process_additional_actions(action: String, delta: float) -> bool:
+func process_additional_actions(delta: float) -> bool:
   match(action):
     'heavy_attack':
       heavy_attack(delta)
