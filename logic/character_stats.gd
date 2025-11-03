@@ -1,4 +1,15 @@
 class_name CharacterStats
 extends Node
 
-@export var movement_speed: int = 100
+var max_hp: int
+var movement_speed: int
+var attack: int
+
+func _init(
+  start_max_hp: int,
+  start_movement_speed: int,
+  start_attack: int
+) -> void:
+  max_hp = start_max_hp
+  movement_speed = start_movement_speed
+  attack = start_attack

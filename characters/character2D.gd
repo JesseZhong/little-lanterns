@@ -1,10 +1,20 @@
 @abstract class_name Character2D
 extends Node2D
 
+signal on_hit
+
 ## Default Z-Index of characters.
 const CHARACTER_PLANE: int = 20
 
-signal on_hit
+## Current position of the character's body.
+var current_position:
+  get:
+    return _character_body.position \
+      if _character_body \
+      else Vector2.ZERO
+  set(value):
+    if _character_body:
+      _character_body.position = value
 
 ## Sets the intended movement direction
 ## of the character. This will be normalized
@@ -20,56 +30,58 @@ var move_direction: Vector2 = Vector2.ZERO
 ## are currently blocked by other animations.
 var action: String = 'idle'
 
-# Internally used.
-var anim_player: AnimationPlayer
-var character_body: CharacterBody2D
-var character_stats: CharacterStats
-var block_anim: bool = false
-var face_direction: String = 'down'
+var _anim_player: AnimationPlayer
+var _character_body: CharacterBody2D
+var _character_condition: CharacterCondition
+var _block_anim: bool = false
+var _face_direction: String = 'down'
 
-var current_position:
-  get:
-    return character_body.position \
-      if character_body \
-      else Vector2.ZERO
-  set(value):
-    if character_body:
-      character_body.position = value
+func _init(condition: CharacterCondition) -> void:
+  _character_condition = condition
 
-## Sets character to 'idle'.
-func stand(_delta: float):
-  smooth_play('idle')
-
-## Attempts to move and animate the character.
-## Also sets the face direction.
-func move(_delta: float):
-  if move_direction.length() > 0:
-    var x = move_direction.x
-    var y = move_direction.y
-    if abs(y) > abs(x):
-      if y > 0:
-        smooth_play('walk_down')
-      elif y < 0:
-        smooth_play('walk_up')
-    else:
-      if x > 0:
-        smooth_play('walk_right')
-      elif x < 0:
-        smooth_play('walk_left')
-        
-    # Preserve the face direction for all other actions.
-    face_direction = calc_face_direction(move_direction)
-
-func get_hit(_delta: float):
-  # TODO: Change to incoming hit direction.
-  smooth_play('hit_%s' % face_direction)
+func _ready() -> void:
+  _anim_player = $AnimationPlayer
+  _character_body = $CharacterBody2D
   
-## Perform a light attack. Temporarily stop any character movement.
-## Can be overridden. For instance, for passive
-## characters, override to do nothing.
-func light_attack(_delta: float):
-  move_direction = Vector2.ZERO
-  smooth_play('light_attack_%s' % face_direction)
+  # Ensure all characters and controllers are on the same plane.
+  z_index = CHARACTER_PLANE
+  
+  # Enable Y-Sorting to draw furthest characters first.
+  y_sort_enabled = true
+
+func _process(delta: float) -> void:
+  # Determine the animation based off the
+  # intended action and if animations are blocked.
+  if _anim_player:
+    if _block_anim:
+      if action == '_get_hit':
+        _get_hit(delta)
+    else:
+      match(action):
+        '_stand':
+          _stand(delta)
+        '_move':
+          _move(delta)
+        '_light_attack':
+          _light_attack(delta)
+        _:
+          if not _process_additional_actions(delta):
+            _stand(delta)
+
+func _physics_process(delta: float) -> void:
+  if _character_body and _character_condition:
+    _character_body.move_and_collide(
+      move_direction.normalized() * _character_condition.movement_speed * delta)
+
+## Prevent other actions from being played.
+## Should be used in [AnimationPlayer] track.
+func block_animations():
+  _block_anim = true
+
+## Releases block, allowing other actions to be played.
+## Should be used in [AnimationPlayer] track.
+func unblock_animations():
+  _block_anim = false
 
 ## Attempts to play an animation.
 ##
@@ -83,10 +95,10 @@ func light_attack(_delta: float):
 ## this method will simply keep playing the animation
 ## with no changes.
 func smooth_play(animation_name: String):
-  if animation_name != anim_player.assigned_animation:
-    anim_player.play("RESET")
-    anim_player.advance(0)
-  anim_player.play(animation_name)
+  if animation_name != _anim_player.assigned_animation:
+    _anim_player.play("RESET")
+    _anim_player.advance(0)
+  _anim_player.play(animation_name)
 
 func calc_face_direction(vector: Vector2) -> String:
   match(vector):
@@ -102,6 +114,41 @@ func calc_face_direction(vector: Vector2) -> String:
       return 'right'
     _:
       return 'down'
+
+## Sets character to 'idle'.
+func _stand(_delta: float):
+  smooth_play('idle')
+
+## Attempts to _move and animate the character.
+## Also sets the face direction.
+func _move(_delta: float):
+  if move_direction.length() > 0:
+    var x = move_direction.x
+    var y = move_direction.y
+    if abs(y) > abs(x):
+      if y > 0:
+        smooth_play('walk_down')
+      elif y < 0:
+        smooth_play('walk_up')
+    else:
+      if x > 0:
+        smooth_play('walk_right')
+      elif x < 0:
+        smooth_play('walk_left')
+        
+    # Preserve the face direction for all other actions.
+    _face_direction = calc_face_direction(move_direction)
+
+func _get_hit(_delta: float):
+  # TODO: Change to incoming hit direction.
+  smooth_play('hit_%s' % _face_direction)
+  
+## Perform a light attack. Temporarily stop any character movement.
+## Can be overridden. For instance, for passive
+## characters, override to do nothing.
+func _light_attack(_delta: float):
+  move_direction = Vector2.ZERO
+  smooth_play('light_attack_%s' % _face_direction)
   
 ## Override to handle additional actions.
 ## 
@@ -111,50 +158,5 @@ func calc_face_direction(vector: Vector2) -> String:
 ## if an action is handled by this method. This informs
 ## [Character2D] that the current action is handled
 ## and it should not default to a character's 'idle' pose
-func process_additional_actions(_delta: float) -> bool:
+func _process_additional_actions(_delta: float) -> bool:
   return false
-  
-## Prevent other actions from being played.
-## Should be used in [AnimationPlayer] track.
-func block_animations():
-  block_anim = true
-
-## Releases block, allowing other actions to be played.
-## Should be used in [AnimationPlayer] track.
-func unblock_animations():
-  block_anim = false
-
-func _ready() -> void:
-  anim_player = $AnimationPlayer
-  character_body = $CharacterBody2D
-  character_stats = $'../CharacterStats' # Sibling.
-  
-  # Ensure all characters and controllers are on the same plane.
-  z_index = CHARACTER_PLANE
-  
-  # Enable Y-Sorting to draw furthest characters first.
-  y_sort_enabled = true
-
-func _process(delta: float) -> void:
-  # Determine the animation based off the
-  # intended action and if animations are blocked.
-  if anim_player:
-    if block_anim:
-      if action == 'get_hit':
-        get_hit(delta)
-    else:
-      match(action):
-        'stand':
-          stand(delta)
-        'move':
-          move(delta)
-        'light_attack':
-          light_attack(delta)
-        _:
-          if not process_additional_actions(delta):
-            stand(delta)
-
-func _physics_process(delta: float) -> void:
-  if character_body and character_stats:
-    character_body.move_and_collide(
-      move_direction.normalized() * character_stats.movement_speed * delta)
