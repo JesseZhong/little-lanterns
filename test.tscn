@@ -1,15 +1,11 @@
-[gd_scene load_steps=4 format=3 uid="uid://bd8nmsvo57gue"]
+[gd_scene load_steps=3 format=3 uid="uid://bd8nmsvo57gue"]
 
 [ext_resource type="Script" uid="uid://bhmu0od6skaex" path="res://test.gd" id="1_ppyta"]
 [ext_resource type="PackedScene" uid="uid://doof4ltuwdmuc" path="res://map/test_map.tscn" id="3_6uqi0"]
-[ext_resource type="PackedScene" uid="uid://biqsul6dsnor1" path="res://controllers/orc_ai.tscn" id="5_ykrsh"]
 
 [node name="Test" type="Node2D"]
 y_sort_enabled = true
 script = ExtResource("1_ppyta")
-
-[node name="OrcAI" parent="." instance=ExtResource("5_ykrsh")]
-start_position = Vector2(45, 11)
 
 [node name="TestMap" parent="." instance=ExtResource("3_6uqi0")]
 position = Vector2(-200, -100)
