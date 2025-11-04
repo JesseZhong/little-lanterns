@@ -33,7 +33,9 @@ func spawn(
     
     # Attach stats and condition.
     player.add_child(character_stats)
-    player.add_child(CharacterCondition.new(character_stats))
+    var condition = CharacterCondition.new(character_stats)
+    player.setup(condition)
+    player.add_child(condition)
   
     # Setup a camera that can follow a character.
     var camera_options = options.get('follow_camera')

@@ -12,9 +12,6 @@ var current_position:
     return _character_body.position \
       if _character_body \
       else Vector2.ZERO
-  set(value):
-    if _character_body:
-      _character_body.position = value
 
 ## Sets the intended movement direction
 ## of the character. This will be normalized
@@ -35,13 +32,12 @@ var _character_body: CharacterBody2D
 var _character_condition: CharacterCondition
 var _block_anim: bool = false
 var _face_direction: String = 'down'
-
-func _init(condition: CharacterCondition) -> void:
-  _character_condition = condition
+var _start_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
   _anim_player = $AnimationPlayer
   _character_body = $CharacterBody2D
+  _character_body.position = _start_position
   
   # Ensure all characters and controllers are on the same plane.
   z_index = CHARACTER_PLANE
@@ -54,15 +50,15 @@ func _process(delta: float) -> void:
   # intended action and if animations are blocked.
   if _anim_player:
     if _block_anim:
-      if action == '_get_hit':
+      if action == 'get_hit':
         _get_hit(delta)
     else:
       match(action):
-        '_stand':
+        'stand':
           _stand(delta)
-        '_move':
+        'move':
           _move(delta)
-        '_light_attack':
+        'light_attack':
           _light_attack(delta)
         _:
           if not _process_additional_actions(delta):
@@ -71,7 +67,22 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
   if _character_body and _character_condition:
     _character_body.move_and_collide(
-      move_direction.normalized() * _character_condition.movement_speed * delta)
+      move_direction.normalized()
+      * _character_condition.movement_speed.value
+      * delta)
+
+func setup(
+  start_position: Vector2,
+  condition: CharacterCondition
+) -> void:
+  _start_position = start_position
+  _character_condition = condition
+  
+func teleport(
+  target_position: Vector2
+):
+  # TODO: Perform a physics safety check.
+  _character_body.position = target_position
 
 ## Prevent other actions from being played.
 ## Should be used in [AnimationPlayer] track.

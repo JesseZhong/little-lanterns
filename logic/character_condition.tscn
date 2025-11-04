@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://da5n3ocis0aiy"]
+
+[ext_resource type="Script" uid="uid://bc88nwf0x1dpy" path="res://logic/character_condition.gd" id="1_12l8d"]
+
+[node name="CharacterCondition" type="Node"]
+script = ExtResource("1_12l8d")
