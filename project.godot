@@ -50,4 +50,6 @@ heavy_attack={
 
 [layer_names]
 
-2d_physics/layer_4="Physical Bodies"
+2d_physics/layer_2="Physical Bodies"
+2d_physics/layer_3="Attacks"
+2d_physics/layer_4="AI Vision"

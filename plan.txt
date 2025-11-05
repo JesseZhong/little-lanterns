@@ -30,6 +30,10 @@ monster AI
       then a percent chance to maintain and percentages of changing to other strats
       roll
 
+monster ideas
+  mimic - variants
+    chest
+    book (riddle/rideword)
 
 camera
   zoom with mouse
