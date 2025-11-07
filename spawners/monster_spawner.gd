@@ -22,18 +22,21 @@ func spawn(
     and character_scene.can_instantiate() \
     and ai_scene \
     and ai_scene.can_instantiate():
+      
+    var condition = CharacterCondition.new(character_stats)
+      
+    var character: Character2D = character_scene.instantiate()
+    character.setup(spawn_location, condition)
 
     # Initialize a new AI controller
     # and attach the character scene.
     var ai: Controller = ai_scene.instantiate()
-    ai.start_position = spawn_location
-    ai.character_scene = character_scene
+    ai.setup(character)
     
-    # Attach stats and condition.
+    # Attach stats, condition, and character.
     ai.add_child(character_stats)
-    var condition = CharacterCondition.new(character_stats)
-    ai.setup(condition)
     ai.add_child(condition)
+    ai.add_child(character)
     
     # Finally, add to scene.
     world.add_child(ai)

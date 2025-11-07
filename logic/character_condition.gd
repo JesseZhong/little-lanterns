@@ -31,7 +31,7 @@ var current_hp: int:
     return current_hp
   set(value):
     var previous_hp = current_hp
-    current_hp = max(0, min(max_hp.value, value))
+    current_hp = clamp(max_hp.value, 0, value)
     
     if previous_hp != current_hp:
       health_changed.emit(previous_hp, current_hp)

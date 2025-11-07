@@ -24,24 +24,27 @@ func spawn(
     and character_scene.can_instantiate() \
     and player_scene \
     and player_scene.can_instantiate():
+      
+    var condition = CharacterCondition.new(character_stats)
+      
+    var character: Character2D = character_scene.instantiate()
+    character.setup(spawn_location, condition)
 
     # Initialize a new player controller
     # and attach the character scene.
     var player: Player = player_scene.instantiate()
-    player.start_position = spawn_location
-    player.character_scene = character_scene
+    player.setup(character)
     
-    # Attach stats and condition.
+    # Attach stats, condition, and character.
     player.add_child(character_stats)
-    var condition = CharacterCondition.new(character_stats)
-    player.setup(condition)
     player.add_child(condition)
+    player.add_child(character)
   
     # Setup a camera that can follow a character.
     var camera_options = options.get('follow_camera')
     if camera_options:
       var camera = FollowCamera2D.new(
-        player,
+        character,
         camera_options.get('enabled'),
         camera_options.get('zoom')
       )

@@ -1,17 +1,10 @@
 @abstract class_name Character2D
-extends Node2D
+extends CharacterBody2D
 
 signal on_hit
 
 ## Default Z-Index of characters.
 const CHARACTER_PLANE: int = 20
-
-## Current position of the character's body.
-var current_position:
-  get:
-    return _character_body.position \
-      if _character_body \
-      else Vector2.ZERO
 
 ## Sets the intended movement direction
 ## of the character. This will be normalized
@@ -28,7 +21,6 @@ var move_direction: Vector2 = Vector2.ZERO
 var action: String = 'idle'
 
 var _anim_player: AnimationPlayer
-var _character_body: CharacterBody2D
 var _character_condition: CharacterCondition
 var _block_anim: bool = false
 var _face_direction: String = 'down'
@@ -36,8 +28,7 @@ var _start_position: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
   _anim_player = $AnimationPlayer
-  _character_body = $CharacterBody2D
-  _character_body.position = _start_position
+  position = _start_position
   
   # Ensure all characters and controllers are on the same plane.
   z_index = CHARACTER_PLANE
@@ -65,8 +56,8 @@ func _process(delta: float) -> void:
             _stand(delta)
 
 func _physics_process(delta: float) -> void:
-  if _character_body and _character_condition:
-    _character_body.move_and_collide(
+  if _character_condition:
+    move_and_collide(
       move_direction.normalized()
       * _character_condition.movement_speed.value
       * delta)
@@ -82,7 +73,7 @@ func teleport(
   target_position: Vector2
 ):
   # TODO: Perform a physics safety check.
-  _character_body.position = target_position
+  position = target_position
 
 ## Prevent other actions from being played.
 ## Should be used in [AnimationPlayer] track.
