@@ -35,6 +35,115 @@ monster ideas
     chest
     book (riddle/rideword)
 
+magic types
+  fire
+  electric
+  wind
+  water/ice
+  earth/nature
+  light
+  shadow
+
+realms/concepts
+  Veridian Fields
+  Fuzzy's Dream / Nightmare
+    The dream world of Fuzzy the Teddy Bear.
+      Dream state - Toys, colors, and music.
+      Nightmare state - Clowns, apparitions, and eerie sounds.
+  Vermillion Sky
+    Flycatcher that brings the warm summer sunset.
+      Fire, recovery, rebirth. Birds.
+  Mt. Asura
+    Restless snow-capped volcano.
+      Healing hotsprings, explosions, mountain thunderstorms.
+  Zoltan's Crystal Mirror
+    Magic hand mirror of the magician Zoltan.
+      Illusions, teleportation, magic reflection, pocket dimensions.
+        Key item: Vial of Mercury - Permits usage reflection and dimension magic.
+  Dwarf Master's Forge
+    Mighty hearth of an unknown master smith.
+      Fire, earth, & steel themed.
+        Skills:
+          bellows
+          hearthfire
+          temper
+  Moonlit Harp
+  Watchmaker's Timepiece
+    Skills:
+      tempo
+      metronome
+  Library of 
+
+classes
+  novice
+    squire-+-swords
+           +-spear
+           +-polearms
+           +-axes
+           +-blunt
+           +-shields
+
+    archer-+-bow
+           +-crossbow
+           +-throwing knives
+
+    monk-+-fists
+         +-polearms
+         +-blunt
+         +-fire
+         +-light
+         +-nature
+
+    performer-+-music
+    busker    +-dancing
+              +-illusions
+              +-thievery
+
+    apprentice-+-metalwork
+               +-woodwork
+               +-alchemy
+               +-clockmaking
+
+    magi-+-water
+         +-electric
+         +-wind
+         +-fire
+
+      ninja
+        requires: sword, illusions, throwing knives, illusions, thievery, water, wind, fire
+          +-shadow
+      lancer
+        requires: spears, polearms, shields, clockmaking, water
+      rune knight
+        requires: any of swords, spear, polearms; fire, wind, nature
+        abilities:
+          +-electric
+      landsknecht
+        requires: any 3 of swords, spears, polearms, axes, blunt, shield, bow, crossbow
+      acrobat
+        requires: dancing, bow,
+      clown
+        requires: music, dancing, illusions, 
+      wizard
+        skills:
+          overcast
+            darkens area with cloud shadows; allows for large area rain, snow, lighting spells to followup
+            illusions get added effects
+          gust
+            blows area with wind; moves and gradually clears overcast
+
+future
+  tamer
+  beast master (tamer & monk)
+  samurai
+    requires: sword, polearms, bow
+
+spells can be cast by/with multiple weapons or items
+  add scaling per weapon / item
+    varies skill to skill
+      can use A/B/C/D+ to indicate scaling
+
+
 camera
   zoom with mouse
       
