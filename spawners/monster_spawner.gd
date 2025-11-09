@@ -24,14 +24,19 @@ func spawn(
     and ai_scene.can_instantiate():
       
     var condition = CharacterCondition.new(character_stats)
+    
+    var agent = NavigationAgent2D.new()
+    agent.path_desired_distance = 2.0
+    agent.target_desired_distance = 2.0
       
     var character: Character2D = character_scene.instantiate()
     character.setup(spawn_location, condition)
+    character.add_child(agent)
 
     # Initialize a new AI controller
-    # and attach the character scene.
+    # and attach the character and agent.
     var ai: Controller = ai_scene.instantiate()
-    ai.setup(character)
+    ai.setup(character, agent)
     
     # Attach stats, condition, and character.
     ai.add_child(character_stats)
