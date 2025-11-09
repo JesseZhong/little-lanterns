@@ -12,11 +12,25 @@ func _init(stats: CharacterStats) -> void:
     return
   character_stats = stats
   movement_speed = Stat.new(stats, func(s: CharacterStats): return s.movement_speed)
+  run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
   max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
   attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
 
+var walk_speed: float:
+  get:
+    if not movement_speed:
+      return 0.0
+    return movement_speed.value
+
+var run_speed: float:
+  get:
+    if not movement_speed or not run_modifier:
+      return 0.0
+    return movement_speed.value * run_modifier.value
 
 var movement_speed: Stat
+
+var run_modifier: Stat
 
 ## Current max HP. Can't go below 0.
 var max_hp: Stat

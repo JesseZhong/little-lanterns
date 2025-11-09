@@ -11,6 +11,7 @@ func _ready() -> void:
     CharacterStats.new(
       300,
       120,
+      1.4,
       25
     ),
     {
@@ -28,6 +29,7 @@ func _ready() -> void:
     CharacterStats.new(
       400,
       80,
+      1.2,
       43
     )
   )

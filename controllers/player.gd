@@ -20,7 +20,9 @@ func _process(_delta: float) -> void:
         _character.action = 'light_attack'
       elif move.length() > 0:
         _character.move_direction = move
-        _character.action = 'move'
+        _character.action = 'run' \
+          if Input.is_action_pressed("run") \
+          else 'walk'
       else:
         _character.move_direction = Vector2.ZERO
         _character.action = 'idle'

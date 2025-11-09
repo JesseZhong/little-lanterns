@@ -25,6 +25,7 @@ var _character_condition: CharacterCondition
 var _block_anim: bool = false
 var _face_direction: String = 'down'
 var _start_position: Vector2 = Vector2.ZERO
+var _move_speed: float = 0.0
 
 func _ready() -> void:
   _anim_player = $AnimationPlayer
@@ -47,8 +48,10 @@ func _process(delta: float) -> void:
       match(action):
         'stand':
           _stand(delta)
-        'move':
-          _move(delta)
+        'walk':
+          _walk(delta)
+        'run':
+          _run(delta)
         'light_attack':
           _light_attack(delta)
         _:
@@ -59,7 +62,7 @@ func _physics_process(delta: float) -> void:
   if _character_condition:
     move_and_collide(
       move_direction.normalized()
-      * _character_condition.movement_speed.value
+      * _move_speed
       * delta)
 
 func setup(
@@ -103,6 +106,7 @@ func smooth_play(animation_name: String):
   _anim_player.play(animation_name)
 
 func calc_face_direction(vector: Vector2) -> String:
+  _anim_player.speed_scale = 1.0
   match(vector):
     var v when v == Vector2.ZERO:
       return 'down'
@@ -121,7 +125,7 @@ func calc_face_direction(vector: Vector2) -> String:
 func _stand(_delta: float):
   smooth_play('idle')
 
-## Attempts to _move and animate the character.
+## Attempts to move and animate the character.
 ## Also sets the face direction.
 func _move(_delta: float):
   if move_direction.length() > 0:
@@ -140,6 +144,15 @@ func _move(_delta: float):
         
     # Preserve the face direction for all other actions.
     _face_direction = calc_face_direction(move_direction)
+    
+func _walk(delta: float):
+  _move_speed = _character_condition.walk_speed
+  _move(delta)
+  
+func _run(delta: float):
+  _anim_player.speed_scale = _character_condition.run_modifier.value
+  _move_speed = _character_condition.run_speed
+  _move(delta)
 
 func _get_hit(_delta: float):
   # TODO: Change to incoming hit direction.

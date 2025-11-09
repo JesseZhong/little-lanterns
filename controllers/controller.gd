@@ -16,6 +16,7 @@ func _ready() -> void:
   y_sort_enabled = true
 
 func setup(
-  character: Character2D
+  character: Character2D,
+  ..._args
 ) -> void:
   _character = character
