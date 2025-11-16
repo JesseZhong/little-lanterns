@@ -9,9 +9,7 @@ func spawn(
   _options: Dictionary[String, Variant] = {}
 ):
   # Ensure character stats are valid.
-  if not character_stats:
-    print_debug('Valid character stats required for spawning.')
-    return
+  assert(character_stats, 'Valid character stats required for spawning.')
   
   # Attempt to get AI and character scenes.
   var scenes = _get_character_scene(character_name)
@@ -36,7 +34,7 @@ func spawn(
     # Initialize a new AI controller
     # and attach the character and agent.
     var ai: Controller = ai_scene.instantiate()
-    ai.setup(character, agent)
+    ai.setup(character, condition, agent)
     
     # Attach stats, condition, and character.
     ai.add_child(character_stats)

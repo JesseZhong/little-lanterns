@@ -6,16 +6,6 @@ signal death
 
 var character_stats: CharacterStats
 
-func _init(stats: CharacterStats) -> void:
-  if not stats or stats is not CharacterStats:
-    print_debug('Error: Invalid character stats passed to character condition.')
-    return
-  character_stats = stats
-  movement_speed = Stat.new(stats, func(s: CharacterStats): return s.movement_speed)
-  run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
-  max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
-  attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
-
 var walk_speed: float:
   get:
     if not movement_speed:
@@ -40,17 +30,17 @@ var max_hp: Stat
 ## Value reaching 0 triggers [death].
 var current_hp: int:
   get:
-    if not current_hp:
-      current_hp = max_hp.value
-    return current_hp
+    if not _current_hp:
+      _current_hp = max_hp.value
+    return _current_hp
   set(value):
-    var previous_hp = current_hp
-    current_hp = clamp(max_hp.value, 0, value)
+    var previous_hp = _current_hp
+    _current_hp = clamp(max_hp.value, 0, value)
     
-    if previous_hp != current_hp:
+    if previous_hp != _current_hp:
       health_changed.emit(previous_hp, current_hp)
     
-    if current_hp <= 0:
+    if _current_hp <= 0:
       death.emit()
       
 var isAlive: bool:
@@ -66,6 +56,19 @@ var isDead: bool:
     return false
     
 var attack: Stat
+
+var has_super_armor: bool = false
+
+var _current_hp: int
+
+func _init(stats: CharacterStats) -> void:
+  assert(stats is CharacterStats, 'Invalid character stats passed to character condition.')
+  
+  character_stats = stats
+  movement_speed = Stat.new(stats, func(s: CharacterStats): return s.movement_speed)
+  run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
+  max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
+  attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
 
 ## Maintains a mutable character stat.
 class Stat extends Object:

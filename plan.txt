@@ -138,6 +138,10 @@ future
   samurai
     requires: sword, polearms, bow
 
+    light mage
+      illunimation (lights a dark area continuously)
+      flash bang
+
 spells can be cast by/with multiple weapons or items
   add scaling per weapon / item
     varies skill to skill

@@ -6,17 +6,23 @@ extends Node2D
 @export
 var faction: String = ''
 
+var character: Character2D:
+  get: return _character
+  
+var condition: CharacterCondition:
+  get: return _condition
+
 var _character: Character2D
+var _condition: CharacterCondition
 
 func _ready() -> void:
-  if not _character:
-    print_debug('Error: Invalid characte for controller.')
-  
   # Enable Y-Sorting to draw furthest characters first.
   y_sort_enabled = true
 
 func setup(
-  character: Character2D,
+  own_character: Character2D,
+  own_condition: CharacterCondition,
   ..._args
 ) -> void:
-  _character = character
+  _character = own_character
+  _condition = own_condition

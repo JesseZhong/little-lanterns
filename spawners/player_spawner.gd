@@ -13,9 +13,7 @@ func spawn(
   options: Dictionary[String, Variant] = {}
 ):
   # Ensure character stats are valid.
-  if not character_stats:
-    print_debug('Valid character stats required for spawning.')
-    return
+  assert(character_stats, 'Valid character stats required for spawning.')
   
   # Attempt to locating the requested scene.
   var character_scene = _get_character_scene(character_name)
@@ -33,7 +31,7 @@ func spawn(
     # Initialize a new player controller
     # and attach the character scene.
     var player: Player = player_scene.instantiate()
-    player.setup(character)
+    player.setup(character, condition)
     
     # Attach stats, condition, and character.
     player.add_child(character_stats)

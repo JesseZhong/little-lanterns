@@ -1,10 +1,15 @@
 @abstract class_name Character2D
 extends CharacterBody2D
 
-signal on_hit
+signal action_started(action_name: String)
+signal action_ended(action_name: String)
+signal get_hit(origin_position: Vector2)
 
 ## Default Z-Index of characters.
 const CHARACTER_PLANE: int = 20
+
+## How much to scale down the Y movement due to perspective.
+const Y_MOVEMENT_SCALE: float = 0.83
 
 ## Sets the intended movement direction
 ## of the character. This will be normalized
@@ -20,32 +25,50 @@ var move_direction: Vector2 = Vector2.ZERO
 ## are currently blocked by other animations.
 var action: String = 'idle'
 
+var condition: CharacterCondition:
+  get:
+    return _character_condition
+
 var _anim_player: AnimationPlayer
+var _attack_area: AbilityArea
 var _character_condition: CharacterCondition
 var _block_anim: bool = false
 var _face_direction: String = 'down'
-var _start_position: Vector2 = Vector2.ZERO
 var _move_speed: float = 0.0
+var _previous_action: String = 'idle'
 
 func _ready() -> void:
   _anim_player = $AnimationPlayer
-  position = _start_position
+  _attack_area = $AttackArea
+  
+  assert(_anim_player, 'Invalid animation player for character.')
   
   # Ensure all characters and controllers are on the same plane.
   z_index = CHARACTER_PLANE
   
   # Enable Y-Sorting to draw furthest characters first.
   y_sort_enabled = true
+  
+  # Reset the action back to 'idle' after
+  # non-looping animation finishes.
+  _anim_player.animation_finished.connect(
+    func (_name: String): action = 'idle'
+  )
+  get_hit.connect(_on_get_hit)
 
 func _process(delta: float) -> void:
+  _anim_player.speed_scale = 1.0
   # Determine the animation based off the
   # intended action and if animations are blocked.
   if _anim_player:
     if _block_anim:
+      # Getting hit overrides any other action.
       if action == 'get_hit':
         _get_hit(delta)
     else:
       match(action):
+        'get_hit':
+          _get_hit(delta)
         'stand':
           _stand(delta)
         'walk':
@@ -57,20 +80,26 @@ func _process(delta: float) -> void:
         _:
           if not _process_additional_actions(delta):
             _stand(delta)
+            
+      # Inform subscribers that actions have changed.
+      if _previous_action != action:
+        action_ended.emit(_previous_action)
+        action_started.emit(action)
+        _previous_action = action
 
 func _physics_process(delta: float) -> void:
+  # Handle movement.
   if _character_condition:
-    move_and_collide(
-      move_direction.normalized()
-      * _move_speed
-      * delta)
+    var movement = move_direction.normalized() * _move_speed * delta
+    movement.y *= Y_MOVEMENT_SCALE # Scale down Y movement due to perspective.
+    move_and_collide(movement)
 
 func setup(
   start_position: Vector2,
-  condition: CharacterCondition
+  own_condition: CharacterCondition
 ) -> void:
-  _start_position = start_position
-  _character_condition = condition
+  position = start_position
+  _character_condition = own_condition
   
 func teleport(
   target_position: Vector2
@@ -106,19 +135,30 @@ func smooth_play(animation_name: String):
   _anim_player.play(animation_name)
 
 func calc_face_direction(vector: Vector2) -> String:
-  _anim_player.speed_scale = 1.0
-  match(vector):
-    var v when v == Vector2.ZERO:
-      return 'down'
-    var v when v.normalized().dot(Vector2.DOWN) > 0: 
-      return 'down'
-    var v when v.normalized().dot(Vector2.UP) > 0:
+  var normalized = vector.normalized()
+  if normalized == Vector2.ZERO:
+    return 'down'
+  
+  var dot_down = normalized.dot(Vector2.DOWN)
+  var dot_up = normalized.dot(Vector2.UP)
+  var dot_left = normalized.dot(Vector2.LEFT)
+  var dot_right = normalized.dot(Vector2.RIGHT)
+  
+  var most_aligned = max(
+    dot_down,
+    dot_up,
+    dot_left,
+    dot_right,
+  )
+  
+  match(most_aligned):
+    dot_up:
       return 'up'
-    var v when v.normalized().dot(Vector2.LEFT) > 0:
+    dot_left:
       return 'left'
-    var v when v.normalized().dot(Vector2.RIGHT) > 0:
+    dot_right:
       return 'right'
-    _:
+    dot_down, _:
       return 'down'
 
 ## Sets character to 'idle'.
@@ -175,3 +215,10 @@ func _light_attack(_delta: float):
 ## and it should not default to a character's 'idle' pose
 func _process_additional_actions(_delta: float) -> bool:
   return false
+
+## Handle any attacks hitting the character.
+## If the character has super armor, shrug off hit.
+func _on_get_hit(origin_position: Vector2) -> void:
+  if not _character_condition.has_super_armor:
+    action = 'get_hit'
+    _face_direction = calc_face_direction(origin_position - global_position)

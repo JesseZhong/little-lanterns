@@ -22,8 +22,6 @@ func _ready() -> void:
   
   area_entered.connect(_on_area_enter)
   area_exited.connect(_on_area_exit)
-  body_entered.connect(_on_body_enter)
-  body_exited.connect(_on_body_exit)
   
 ## Clear previous contacts and
 ## opens a deflect/parryable window.
@@ -39,36 +37,28 @@ func trigger_effect(effect: Callable) -> void:
   if not _deflected:
     Query.foreach(
       _contacted,
-      func (character: Character2D) -> void:
+      func (_path: NodePath, character: Character2D) -> void:
         effect.call(character)
         if harmful:
-          character.get_hit.emit()
+          character.get_hit.emit(global_position)
     )
 
 ## If this area is deflectable/parryable, another area
 ## interacting with it will cause it to be rendered useless.
+## Otherwise, if the area belongs to a character, track it.
 func _on_area_enter(area: Area2D) -> void:
   if area.get_parent() != get_parent():
-    print('IN')
-  if area is AbilityArea:
-    if deflectable:
-      _deflected = true
-      deflected.emit(area as AbilityArea)
-      
-
+    if area is AbilityArea:
+      if deflectable:
+        _deflected = true
+        deflected.emit(area as AbilityArea)
+    elif not _deflected and area.get_parent() is Character2D:
+      _contacted[area.get_path()] = area.get_parent() as Character2D
+  
+## Untrack any areas that are no longer in the ability area.    
 func _on_area_exit(area: Area2D) -> void:
   if area.get_parent() != get_parent():
-    print('OUT')
+    var path = area.get_path()
+    if path in _contacted:
+      _contacted.erase(path)
     
-## Track any bodies contacted by the ability area.
-## Deflected/parried abilities will stop further tracking.
-func _on_body_enter(body: Node2D) -> void:
-  print('SHIT')
-  if not _deflected and body is Character2D:
-    _contacted[body.get_path()] = body as Character2D
-
-## Untrack any bodies that are no longer in the ability area.
-func _on_body_exit(body: Node2D) -> void:
-  var path = body.get_path()
-  if path in _contacted:
-    _contacted.erase(path)
