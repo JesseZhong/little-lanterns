@@ -55,6 +55,8 @@ run={
 
 [layer_names]
 
-2d_physics/layer_2="Physical Bodies"
-2d_physics/layer_3="Attacks"
-2d_physics/layer_4="AI Vision"
+2d_physics/layer_1="Terrain"
+2d_physics/layer_2="Lower Body"
+2d_physics/layer_3="Upper Body"
+2d_physics/layer_4="Attacks"
+2d_physics/layer_5="AI Vision"

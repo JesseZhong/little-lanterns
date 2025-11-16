@@ -11,9 +11,7 @@ func _init(
   enable_camera: bool,
   start_zoom: Vector2
 ) -> void:
-  if target is not Node2D:
-    print_debug('Error: Invalid camera target.')
-    return
+  assert(target is Node2D, 'Invalid follow camera target.')
   
   # Setup the transform and attach it to the target.
   _target_transform = RemoteTransform2D.new()
