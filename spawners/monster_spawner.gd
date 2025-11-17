@@ -41,6 +41,9 @@ func spawn(
     ai.add_child(condition)
     ai.add_child(character)
     
+    # Destroy and clear monster when it dies.
+    condition.death.connect(func (): ai.queue_free())
+    
     # Finally, add to scene.
     world.add_child(ai)
 
