@@ -27,6 +27,9 @@ func _ready() -> void:
   
   # Defer to not block _ready()
   _check_server_status.call_deferred()
+
+  # Try to execute next action when a current action is complete.
+  _character.action_ended.connect(func (_action: String): _on_action_complete())
   
 func _process(delta: float) -> void:
   if len(_targets):
@@ -39,12 +42,13 @@ func _process(delta: float) -> void:
         func (t: AiTarget):
           return t.weight
       )
+    else:
+      # No targets? Do your own thang.
+      _process_idle(delta)
   
-  if _current_target:
-    _process_current_target(delta)
-  
-  if len(_targets) == 0:
-    _process_idle(delta)
+  if _current_target and !len(_action_queue):
+    _process_current_target(delta, _targets[_current_target])
+    
   
 func _physics_process(_delta: float) -> void:
   if not _server_ready or not _agent:
@@ -134,11 +138,21 @@ func _on_escape(body: Node2D) -> void:
   if path in _targets:
     _targets.erase(path)
 
+## Dequeues the action queue when a current action finishes.
+func _on_action_complete():
+  if len(_action_queue):
+    var ai_action: Callable = _action_queue.pop_back()
+    ai_action.call()
+
+func _enqueue_action(handler: Callable) -> void:
+  assert(handler, 'Action handler can not be null in AI controller.')
+  _action_queue.push_front(handler)
+
 @abstract
 func _process_targets(delta: float) -> void
 
 @abstract
-func _process_current_target(delta: float) -> void
+func _process_current_target(delta: float, ai_target: AiTarget) -> void
 
 @abstract
 func _process_idle(delta: float) -> void

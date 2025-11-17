@@ -70,7 +70,7 @@ func _init(stats: CharacterStats) -> void:
   _current_hp = max_hp.value
 
 ## Maintains a mutable character stat.
-class Stat extends Object:
+class Stat extends RefCounted:
   var _stats: CharacterStats
   var _property: Callable
   var _effects: Dictionary[String, Callable]

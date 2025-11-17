@@ -95,12 +95,12 @@ func _process_idle(delta: float):
 
     _walk_to(VectorMath.extend(position, _walk_distance_rng.value, direction))
 
-    
-func _process_actions(delta: float) -> bool:
-  return true
- 
-func _process_current_target(delta: float) -> void:
-  pass
+
+func _process_current_target(_delta: float, ai_target: AiTarget) -> void:
+  _enqueue_action(
+    func ():
+      _run_to(ai_target.position + Vector2(10, 10))
+  )
 
 func _stalk(target: AiTarget):
   var target_position = target.position

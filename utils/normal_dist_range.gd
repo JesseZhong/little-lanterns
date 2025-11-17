@@ -2,7 +2,7 @@
 ## follows normal distribution and is clamped
 ## to a number range.
 class_name NormalDistRange
-extends Object
+extends RefCounted
 
 var value: float:
   get:

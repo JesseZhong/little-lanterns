@@ -1,5 +1,5 @@
 class_name AiTarget
-extends Object
+extends RefCounted
   
 var _controller: Controller
 

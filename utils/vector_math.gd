@@ -1,5 +1,5 @@
 class_name VectorMath
-extends Node
+extends RefCounted
 
 static func extend(vector: Vector2, length: float, angle: float) -> Vector2:
   var direction = Vector2.RIGHT.rotated(angle)

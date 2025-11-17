@@ -18,6 +18,10 @@ func _process(_delta: float) -> void:
 
       if Input.is_action_pressed('light_attack'):
         _character.action = 'light_attack'
+      elif Input.is_action_pressed('heavy_attack'):
+        _character.action = 'heavy_attack'
+      elif Input.is_action_pressed('charge_attack'):
+        _character.action = 'charge_attack'
       elif move.length() > 0:
         _character.move_direction = move
         _character.action = 'run' \

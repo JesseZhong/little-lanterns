@@ -1,5 +1,5 @@
 class_name Query
-extends Node
+extends RefCounted
 
 static func foreach(dict: Dictionary, predicate: Callable) -> void:
   assert(dict is Dictionary, 'Query error: Invalid dictionary.')
