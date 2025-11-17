@@ -1,7 +1,7 @@
 extends GutTest
   
 var set_current_hp_params = ParameterFactory.named_parameters(
-  ['value', 'max_hp', 'expectedGet'],
+  ['value', 'max_hp', 'expected_get'],
   [
     [5, 10, 5],
     [200, 150, 150],
@@ -21,7 +21,7 @@ func test_assert_set_current_hp(params = use_parameters(set_current_hp_params)):
   
   condition.current_hp = params.value
   
-  assert_eq(condition.current_hp, params.expectedGet)
+  assert_eq(condition.current_hp, params.expected_get)
   
 func test_assert_set_current_hp_signals_health_changed():
   var stats = add_child_autofree(CharacterStats.new(

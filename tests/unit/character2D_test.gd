@@ -6,7 +6,7 @@ func before_each():
   character = partial_double(Character2D).new()
 
 var calc_face_direction_params = ParameterFactory.named_parameters(
-  ['vector', 'expectedDirection'],
+  ['vector', 'expected_direction'],
   [
     [Vector2.ZERO,  'down'],
     [Vector2.DOWN,  'down'],
@@ -22,4 +22,4 @@ var calc_face_direction_params = ParameterFactory.named_parameters(
 
 func test_assert_calc_face_direction(params = use_parameters(calc_face_direction_params)):
   var result = character.calc_face_direction(params.vector)
-  assert_eq(result, params.expectedDirection)
+  assert_eq(result, params.expected_direction)

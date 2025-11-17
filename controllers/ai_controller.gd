@@ -80,8 +80,11 @@ func setup(
       _scan.body_entered.connect(_on_alert)
       _attention.body_exited.connect(_on_escape)
     
-    if args[2] is NavigationAgent2D:
-      _agent = args[0]
+    assert(
+      args[2] is NavigationAgent2D,
+      'Invalid navigation agent passed to AI controller.'
+    )
+    _agent = args[2] as NavigationAgent2D
 
 func _walk_to(target: Vector2) -> void:
   _agent.target_position = target
