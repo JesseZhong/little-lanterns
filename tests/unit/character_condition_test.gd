@@ -50,3 +50,19 @@ func test_assert_set_zero_current_hp_signals_death():
   condition.current_hp = 0
   
   assert_signal_emitted(condition.death)
+
+func test_assert_set_zero_current_hp_signals_death_once():
+  var stats = add_child_autofree(CharacterStats.new(
+      20,
+      10,
+      1.2,
+      10,
+    ))
+  var condition = add_child_autofree(CharacterCondition.new(stats))
+  
+  watch_signals(condition)
+  condition.current_hp = 0
+  condition.current_hp = 0
+  condition.current_hp = 0
+  
+  assert_signal_emit_count(condition.death, 1)

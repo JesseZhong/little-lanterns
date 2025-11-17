@@ -38,7 +38,7 @@ var current_hp: int:
     if previous_hp != _current_hp:
       health_changed.emit(previous_hp, current_hp)
     
-    if _current_hp <= 0:
+    if _current_hp <= 0 and _current_hp != previous_hp:
       death.emit()
       
 var isAlive: bool:
