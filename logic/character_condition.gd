@@ -2,7 +2,7 @@ class_name CharacterCondition
 extends Node
 
 signal health_changed
-signal death
+signal death()
 
 var character_stats: CharacterStats
 
@@ -30,12 +30,10 @@ var max_hp: Stat
 ## Value reaching 0 triggers [death].
 var current_hp: int:
   get:
-    if not _current_hp:
-      _current_hp = max_hp.value
     return _current_hp
   set(value):
     var previous_hp = _current_hp
-    _current_hp = clamp(max_hp.value, 0, value)
+    _current_hp = clamp(value, 0, max_hp.value)
     
     if previous_hp != _current_hp:
       health_changed.emit(previous_hp, current_hp)
@@ -69,6 +67,7 @@ func _init(stats: CharacterStats) -> void:
   run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
   max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
   attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
+  _current_hp = max_hp.value
 
 ## Maintains a mutable character stat.
 class Stat extends Object:
