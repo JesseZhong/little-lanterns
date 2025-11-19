@@ -31,6 +31,11 @@ func _ready() -> void:
 
   # Try to execute next action when a current action is complete.
   _character.action_ended.connect(func (_action: String): _queue.execute())
+  _agent.navigation_finished.connect(
+    func ():
+      _character.act('idle')
+      _queue.execute()
+  )
   done_waiting.connect(_queue.execute)
   
 
@@ -67,8 +72,8 @@ func _physics_process(_delta: float) -> void:
   if not _server_ready or not _agent:
     return
 
+  # Stop moving once the destination is reached.
   if _agent.is_navigation_finished():
-    _character.move_direction = Vector2.ZERO
     return
   
   # Continue pointing the character towards the destination.
@@ -100,6 +105,9 @@ func setup(
 
   # Setup the command queue.
   _queue = AiCommandQueue.new(self)
+
+  # Clear any idle commands on target enter.
+  _attention.first_target_entered.connect(_queue.clear_queue)
 
 
 # Forces character to idly wait for a certain amount of time.

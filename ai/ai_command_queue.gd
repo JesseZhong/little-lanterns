@@ -8,10 +8,12 @@ var has_commands: bool:
 var _queue: Array = []
 var _ai_controller: AiController
 
+
 func _init(
   ai_controller: AiController
 ) -> void:
   _ai_controller = ai_controller
+
 
 ## Attempts to dequeue and execute the next command,
 ## as long as no previous 

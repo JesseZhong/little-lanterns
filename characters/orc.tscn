@@ -2073,7 +2073,6 @@ material = SubResource("ShaderMaterial_tljfj")
 texture = ExtResource("1_ws5q1")
 hframes = 4
 vframes = 11
-metadata/_edit_group_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0.5, 6)

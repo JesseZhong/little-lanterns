@@ -1,9 +1,7 @@
 @abstract class_name Character2D
 extends CharacterBody2D
 
-signal action_started(action_name: String)
 signal action_ended(action_name: String)
-signal action_changed(old_action_name: String, new_action_name: String)
 signal get_hit(origin_position: Vector2)
 
 ## Default Z-Index of characters.
@@ -52,7 +50,31 @@ func _ready() -> void:
   # Enable Y-Sorting to draw furthest characters first.
   y_sort_enabled = true
   
+  _anim_player.animation_finished.connect(
+    func (_anim_name: String):
+      action_ended.emit(current_action)
+  )
   get_hit.connect(_on_get_hit)
+
+
+func _process(_delta: float) -> void:
+  # Handle any movement animation.
+  if move_direction.length() > 0 and (current_action == 'run' or current_action == 'walk'):
+    var x = move_direction.x
+    var y = move_direction.y
+    if abs(y) > abs(x):
+      if y > 0:
+        smooth_play('walk_down')
+      elif y < 0:
+        smooth_play('walk_up')
+    else:
+      if x > 0:
+        smooth_play('walk_right')
+      elif x < 0:
+        smooth_play('walk_left')
+        
+    # Preserve the face direction for all other actions.
+    _face_direction = VectorMath.calc_face_direction(move_direction, true)
 
 
 func _physics_process(delta: float) -> void:
@@ -79,10 +101,8 @@ func act(action: String) -> void:
   # intended action and if animations are blocked.
   if _anim_player and !_block_anim:
     match(action):
-      'get_hit':
-        _get_hit()
-      'stand':
-        _stand()
+      'idle':
+        _idle()
       'walk':
         _walk()
       'run':
@@ -91,23 +111,9 @@ func act(action: String) -> void:
         _light_attack()
       _:
         if not _process_additional_actions(action):
-          _stand()
+          _idle()
 
-    # Inform subscribers that actions have changed.
-    if _current_action != action:
-
-      # Previous can be anything, next can't be idle.
-      if action != 'idle':
-        action_started.emit(action)
-
-      # Previous can't be idle, but next can be anything.
-      if _current_action != 'idle':
-        action_ended.emit(_current_action)
-        
-      action_changed.emit(_current_action, action)
-      
-      # Swapparoniis.
-      _current_action = action
+    _current_action = action
 
 
 func teleport(
@@ -140,62 +146,31 @@ func unblock_animations():
 ## If the animation requested is already playing,
 ## this method will simply keep playing the animation
 ## with no changes.
-func smooth_play(animation_name: String, queue: bool = false):
+func smooth_play(animation_name: String):
   if animation_name != _anim_player.assigned_animation:
-    if queue:
-      _anim_player.queue('RESET')
-    else:
-      _anim_player.play("RESET")
-      _anim_player.advance(0)
-  
-  if queue:
-    _anim_player.queue(animation_name)
-  else:
-    _anim_player.play(animation_name)
+    _anim_player.play("RESET")
+    _anim_player.advance(0)
+  _anim_player.play(animation_name)
 
 
 ## Sets character to 'idle'.
-func _stand():
+func _idle():
+  move_direction = Vector2.ZERO
   smooth_play('idle')
-
-
-## Attempts to move and animate the character.
-## Also sets the face direction.
-func _move():
-  if move_direction.length() > 0:
-    var x = move_direction.x
-    var y = move_direction.y
-    if abs(y) > abs(x):
-      if y > 0:
-        smooth_play('walk_down')
-      elif y < 0:
-        smooth_play('walk_up')
-    else:
-      if x > 0:
-        smooth_play('walk_right')
-      elif x < 0:
-        smooth_play('walk_left')
-        
-    # Preserve the face direction for all other actions.
-    _face_direction = VectorMath.calc_face_direction(move_direction, true)
 
 
 func _walk():
   _move_speed = _character_condition.walk_speed
-  _move()
 
 
 func _run():
   _anim_player.speed_scale = _character_condition.run_modifier.value
   _move_speed = _character_condition.run_speed
-  _move()
 
 
 func _get_hit():
   smooth_play('hit_%s' % _face_direction)
-
-  # Return to idle after getting hit.
-  smooth_play('idle', true)
+  _anim_player.queue('idle')
 
   
 ## Perform a light attack. Temporarily stop any character movement.

@@ -85,7 +85,7 @@ func _idle():
   _queue.do(HumanoidCommands.patrol_wander(
     _patrol_target,
     _walk_distance_rng.value,
-    PI / 4,
+    PI,
     _idle_interval_rng.value
   ))
 
