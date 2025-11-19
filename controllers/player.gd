@@ -17,16 +17,18 @@ func _process(_delta: float) -> void:
         move.y -= 1
 
       if Input.is_action_pressed('light_attack'):
-        _character.action = 'light_attack'
+        _character.act('light_attack')
       elif Input.is_action_pressed('heavy_attack'):
-        _character.action = 'heavy_attack'
+        _character.act('heavy_attack')
       elif Input.is_action_pressed('charge_attack'):
-        _character.action = 'charge_attack'
+        _character.act('charge_attack')
       elif move.length() > 0:
         _character.move_direction = move
-        _character.action = 'run' \
-          if Input.is_action_pressed("run") \
+        _character.act(
+          'run'
+          if Input.is_action_pressed('run')
           else 'walk'
+        )
       else:
         _character.move_direction = Vector2.ZERO
-        _character.action = 'idle'
+        _character.act('idle')

@@ -8,7 +8,8 @@ static var _charge_attack_modifier_rng = NormalDistRange.new(0.64, 0.2, 0.0, 0.7
 
 func _ready() -> void:
   super._ready()
-  
+
+
 func trigger_light_attack() -> void:
   if _attack_area:
     _attack_area.trigger_effect(
@@ -16,7 +17,8 @@ func trigger_light_attack() -> void:
         var damage = _character_condition.attack.value * _light_attack_modifier_rng.value
         target.condition.current_hp -= damage
     )
-    
+
+
 func trigger_heavy_attack() -> void:
   if _attack_area:
     _attack_area.trigger_effect(
@@ -24,7 +26,8 @@ func trigger_heavy_attack() -> void:
         var damage = _character_condition.attack.value * _heavy_attack_modifier_rng.value
         target.condition.current_hp -= damage
     )
-    
+
+
 func trigger_charge_attack() -> void:
   if _attack_area:
     _attack_area.trigger_effect(
@@ -33,13 +36,16 @@ func trigger_charge_attack() -> void:
         target.condition.current_hp -= damage
     )
 
-func _process_additional_actions(delta: float) -> bool:
+
+func _process_additional_actions(action: String) -> bool:
   match(action):
     'heavy_attack':
-      _heavy_attack(delta)
+      move_direction = Vector2.ZERO
+      smooth_play('heavy_attack_%s' % _face_direction)
+      return true
+    'charge_attack':
+      move_direction = Vector2.ZERO
+      smooth_play('charge_attack_%s' % _face_direction)
       return true
     _:
       return false
-
-func _heavy_attack(_delta: float):
-  smooth_play('heavy_attack_%s' % _face_direction)

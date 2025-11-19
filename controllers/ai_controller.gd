@@ -1,26 +1,27 @@
 @abstract
-class_name AIController
+class_name AiController
 extends Controller
 
-signal destination_reached
+signal done_waiting()
 
-enum CollisionLayers {
-  TERRAIN = 1,
-  CHARACTER_LOWER,
-  CHARACTER_UPPER,
-  ABILITIES,
-  AI,
-}
 
-var _scan: Area2D
-var _attention: Area2D
+const DEFAULT_WAIT_TIME = 0.1
+
+
+var nav_agent: NavigationAgent2D:
+  get: return _agent
+
+var waiting: bool:
+  get: return _wait_time > 0
 
 var _agent: NavigationAgent2D
 var _server_ready: bool = false
+var _wait_time: float = 0
 
-var _targets: Dictionary[NodePath, AiTarget] = {}
-var _current_target: NodePath
-var _action_queue: Array = []
+var _attention: AiAttention
+var _current_target: Variant # "nullable" NodePath
+var _queue: AiCommandQueue
+
 
 func _ready() -> void:
   super._ready()
@@ -29,130 +30,107 @@ func _ready() -> void:
   _check_server_status.call_deferred()
 
   # Try to execute next action when a current action is complete.
-  _character.action_ended.connect(func (_action: String): _on_action_complete())
+  _character.action_ended.connect(func (_action: String): _queue.execute())
+  done_waiting.connect(_queue.execute)
   
+
 func _process(delta: float) -> void:
-  if len(_targets):
-    _process_targets(delta)
+  _advance_time(delta)
+
+  # No targets? Do your own thang.
+  if !_attention.has_targets and _character.is_idle and !waiting:
+    _idle()
+
+  if _attention.has_targets:
+    Query.foreach(
+      _attention.targets,
+      func (key: NodePath, data: AiTarget):
+        _weigh_target(key, data, delta),
+    )
   
     # No target? Get target.
     if not _current_target:
       _current_target = Query.max(
-        _targets,
+        _attention.targets,
         func (t: AiTarget):
           return t.weight
       )
+
+    # Ensure current target is still a valid target.
+    if _current_target in _attention.targets:
+      _engage_target(_attention.targets[_current_target], delta)
     else:
-      # No targets? Do your own thang.
-      _process_idle(delta)
-  
-  if _current_target and !len(_action_queue):
-    _process_current_target(delta, _targets[_current_target])
+      _current_target = null
     
-  
+
 func _physics_process(_delta: float) -> void:
   if not _server_ready or not _agent:
     return
-    
-  # When character reaches its desitnation, reset to idle state.
+
   if _agent.is_navigation_finished():
-    _character.action = 'idle'
     _character.move_direction = Vector2.ZERO
-    destination_reached.emit()
     return
   
   # Continue pointing the character towards the destination.
   _character.move_direction = _character.position.direction_to(_agent.get_next_path_position())
-  
+
+
 func setup(
   own_character: Character2D,
   own_condition: CharacterCondition,
   ...args
 ) -> void:
   super.setup(own_character, own_condition)
-  
-  if len(args) > 2:
-    if args[0] is Area2D and args[1] is Area2D:
-      _scan = args[0]
-      _attention = args[1]
-      
-      # Attach areas to the character.
-      own_character.add_child(_scan)
-      own_character.add_child(_attention)
-      
-      # Wire up the handlers.
-      _scan.body_entered.connect(_on_alert)
-      _attention.body_exited.connect(_on_escape)
-    
-    assert(
-      args[2] is NavigationAgent2D,
-      'Invalid navigation agent passed to AI controller.'
-    )
-    _agent = args[2] as NavigationAgent2D
+  assert(len(args) >= 3, 'AI controller setup requires at least 5 arguments.')
 
-func _walk_to(target: Vector2) -> void:
-  _agent.target_position = target
-  _character.action = 'walk'
-  
-func _run_to(target: Vector2) -> void:
-  _agent.target_position = target
-  _character.action = 'run'
-
-func _setup_ai_area(
-  mean: float,
-  deviation: float,
-  low: float,
-  high: float,
-) -> Area2D:
-  var collision = CollisionShape2D.new()
-  var shape = CircleShape2D.new()
-  var area = Area2D.new()
-  shape.radius = NormalDistRange.generate(
-    mean,
-    deviation,
-    low,
-    high,
+  assert(
+    args[0] is float and args[1] is float,
+    'AI controller setup requires valid attention radius values.')
+  _attention = AiAttention.new(
+    own_character,
+    args[0],
+    args[1]
   )
-  collision.shape = shape
-  area.add_child(collision)
-  area.set_collision_layer_value(CollisionLayers.TERRAIN, false)
-  area.set_collision_layer_value(CollisionLayers.AI, true)
-  area.set_collision_mask_value(CollisionLayers.TERRAIN, false)
-  area.set_collision_mask_value(CollisionLayers.CHARACTER_LOWER, true)
-  area.set_collision_mask_value(CollisionLayers.ABILITIES, true)
-  area.monitorable = false # Should not be "visible" to physics.
-  return area
 
+  assert(
+    args[2] is NavigationAgent2D,
+    'AI controller setup requires a valid navigation agent.'
+  )
+  _agent = args[2] as NavigationAgent2D
+
+  # Setup the command queue.
+  _queue = AiCommandQueue.new(self)
+
+
+# Forces character to idly wait for a certain amount of time.
+func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
+  _wait_time = wait_time
+  _character.move_direction = Vector2.ZERO
+  _character.act('idle')
+
+
+# Ensure the navigation server is ready to receive requests.
 func _check_server_status() -> void:
   await get_tree().physics_frame
   _server_ready = true
-  
-func _on_alert(body: Node2D) -> void:
-  if body.get_path() not in _targets:
-    var controller = body.get_parent()
-    if controller is Controller and controller != self:
-      _targets[body.get_path()] = AiTarget.new(controller)
 
-func _on_escape(body: Node2D) -> void:
-  var path = body.get_path()
-  if path in _targets:
-    _targets.erase(path)
 
-## Dequeues the action queue when a current action finishes.
-func _on_action_complete():
-  if len(_action_queue):
-    var ai_action: Callable = _action_queue.pop_back()
-    ai_action.call()
+## Advance internal timers forward by the simulation delta.
+func _advance_time(delta: float) -> void:
+  if _wait_time > 0:
+    _wait_time -= delta
 
-func _enqueue_action(handler: Callable) -> void:
-  assert(handler, 'Action handler can not be null in AI controller.')
-  _action_queue.push_front(handler)
+    if _wait_time <= 0:
+      done_waiting.emit()
+
 
 @abstract
-func _process_targets(delta: float) -> void
+func _weigh_target(key: NodePath, data: AiTarget, delta: float) -> void
+
 
 @abstract
-func _process_current_target(delta: float, ai_target: AiTarget) -> void
+func _idle() -> void
+
 
 @abstract
-func _process_idle(delta: float) -> void
+func _engage_target(ai_target: AiTarget, delta: float) -> void

@@ -13,13 +13,13 @@ func spawn(
   
   # Attempt to get AI and character scenes.
   var scenes = _get_character_scene(character_name)
-  var ai_scene: PackedScene = scenes[0]
+  var controller_scene: PackedScene = scenes[0]
   var character_scene: PackedScene = scenes[1]
   
   if character_scene \
     and character_scene.can_instantiate() \
-    and ai_scene \
-    and ai_scene.can_instantiate():
+    and controller_scene \
+    and controller_scene.can_instantiate():
       
     var condition = CharacterCondition.new(character_stats)
     
@@ -33,25 +33,25 @@ func spawn(
 
     # Initialize a new AI controller
     # and attach the character and agent.
-    var ai: Controller = ai_scene.instantiate()
-    ai.setup(character, condition, agent)
+    var controller: Controller = controller_scene.instantiate()
+    controller.setup(character, condition, agent)
     
     # Attach stats, condition, and character.
-    ai.add_child(character_stats)
-    ai.add_child(condition)
-    ai.add_child(character)
+    controller.add_child(character_stats)
+    controller.add_child(condition)
+    controller.add_child(character)
     
     # Destroy and clear monster when it dies.
-    condition.death.connect(func (): ai.queue_free())
+    condition.death.connect(func (): controller.queue_free())
     
     # Finally, add to scene.
-    world.add_child(ai)
+    world.add_child(controller)
 
 func _get_character_scene(character_name: String) -> Array:
   # https://docs.godotengine.org/en/stable/classes/class_%40gdscript.html#class-gdscript-method-load
   match(character_name):
     'orc', _:
       return [
-        load('res://controllers/orc_ai.tscn'),
+        load('res://controllers/orc_controller.tscn'),
         load('res://characters/orc.tscn')
       ]
