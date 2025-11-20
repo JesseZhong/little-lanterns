@@ -1,5 +1,7 @@
 class_name HumanoidCommands
 
+const STEP_DISTANCE = 5.3
+
 static func walk_to(
   target_position: Vector2
 ) -> Callable:
@@ -51,7 +53,7 @@ static func rush(
 
 
 # Checks if the target is in range and strikes if they are.
-func _careful_strike(target: AiTarget, tolerable_distance: float) -> Callable:
+func careful_strike(target: AiTarget, tolerable_distance: float) -> Callable:
   return func (ai_controller: AiController):
     if (target.position - ai_controller.position).length() <= tolerable_distance:
       pass
@@ -62,5 +64,37 @@ func _stalk(target: AiTarget):
   
   pass
 
-func _circle(target: AiTarget):
-  pass
+static func circle(
+  ai_controller: AiController,
+  target: AiTarget,
+  distance: float,
+  clockwise: bool,
+  run: bool
+) -> Array[Callable]:
+  assert(distance > 0, '')
+
+  # Account for remainder.
+  var steps = floor(distance / STEP_DISTANCE) + 1
+  var path: Array[Vector2] = []
+  var result: Array[Callable] = []
+
+  # Quick maths.
+  var center = target.position
+  var radius = (ai_controller.position - target.position).length()
+  var travel_angle = distance / radius * (-1 if clockwise else 1)
+  var step_angle = travel_angle / steps
+
+  # Calculate the path the character will take.
+  for i in range(steps):
+    var angle = step_angle * i
+    var x = center.x + radius * cos(angle)
+    var y = center.y + radius * sin(angle)
+    path.append(Vector2(x, y))
+
+  # Populate movement commands.
+  assert(steps == len(path))
+  for destination in path:
+    var method = run_to if run else walk_to
+    result.append(method.call(destination))
+
+  return result

@@ -19,7 +19,7 @@ func _init(
 ## as long as no previous 
 func execute():
   if has_commands:
-    var ai_action: Callable = _queue.pop_back()
+    var ai_action: Callable = _queue.pop_front()
     if ai_action:
       ai_action.call(_ai_controller)
 
@@ -44,7 +44,7 @@ func do(command_s: Variant, now = false) -> void:
 
     # Already a queue? Wait.
     else:
-      _queue.push_front(single)
+      _queue.append(single)
   else:
     var list = command_s as Array[Callable]
 
@@ -52,16 +52,14 @@ func do(command_s: Variant, now = false) -> void:
       clear_queue()
 
       # Grab first command to execute now.
-      var first_command = list.pop_front()
+      var first_command = list.pop_back()
 
-       # Queue the rest.
-      for command in list:
-        _queue.push_front(command)
+      # Queue the rest.
+      _queue.append_array(list)
 
       # Execute the command.
       first_command.call(_ai_controller)
 
     # Throw them into the queue.
     else:
-      for command in list:
-        _queue.push_front(command)
+      _queue.append_array(list)

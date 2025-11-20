@@ -30,14 +30,23 @@ func _ready() -> void:
   _check_server_status.call_deferred()
 
   # Try to execute next action when a current action is complete.
+
+  # This callback ensures that non-looping (not 'idle' or 'move')
+  # animations trigger the next command in queue when finished.
   _character.action_ended.connect(func (_action: String): _queue.execute())
+
+  # This callback ensures that when a character reaches its destination
+  # as part of a command, it should reset animation and execute the next
+  # command in queue.
   _agent.navigation_finished.connect(
     func ():
       _character.act('idle')
       _queue.execute()
   )
+
+  # Finally, this one handles when waiting commands end. Triggers the next.
   done_waiting.connect(_queue.execute)
-  
+
 
 func _process(delta: float) -> void:
   _advance_time(delta)
@@ -115,7 +124,6 @@ func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
   _wait_time = wait_time
   _character.move_direction = Vector2.ZERO
   _character.act('idle')
-
 
 # Ensure the navigation server is ready to receive requests.
 func _check_server_status() -> void:

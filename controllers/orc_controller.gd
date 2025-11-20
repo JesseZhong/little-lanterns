@@ -91,4 +91,6 @@ func _idle():
 
 
 func _engage_target(ai_target: AiTarget, _delta: float) -> void:
+  if !_queue.has_commands:
+    _queue.do(HumanoidCommands.circle(self, ai_target, 200, true, true))
   pass
