@@ -29,6 +29,11 @@ var condition: CharacterCondition:
   get:
     return _character_condition
 
+# Optional: For detecting other characters in range.
+# Currently used by AI to gauge attack range.
+var attack_sense: DirectionalSenseArea:
+  get: return _attack_sense
+
 var _anim_player: AnimationPlayer
 var _attack_area: AbilityArea
 var _character_condition: CharacterCondition
@@ -36,11 +41,13 @@ var _block_anim: bool = false
 var _face_direction: String = 'down'
 var _move_speed: float = 0.0
 var _current_action: String = 'idle'
+var _attack_sense: DirectionalSenseArea
 
 
 func _ready() -> void:
   _anim_player = $AnimationPlayer
   _attack_area = $AttackArea
+  _attack_sense = $DirectionalSenseArea
   
   assert(_anim_player, 'Invalid animation player for character.')
   
@@ -116,6 +123,11 @@ func act(action: String) -> void:
     _current_action = action
 
 
+# Perform an in place face direction change.
+func turn(vector: Vector2) -> void:
+  _face_direction = VectorMath.calc_face_direction(vector, true)
+
+
 func teleport(
   target_position: Vector2
 ):
@@ -169,6 +181,7 @@ func _run():
 
 
 func _get_hit():
+  move_direction = Vector2.ZERO
   smooth_play('hit_%s' % _face_direction)
   _anim_player.queue('idle')
 

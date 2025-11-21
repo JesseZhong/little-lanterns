@@ -7,7 +7,6 @@ signal done_waiting()
 
 const DEFAULT_WAIT_TIME = 0.1
 
-
 var nav_agent: NavigationAgent2D:
   get: return _agent
 
@@ -124,6 +123,10 @@ func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
   _wait_time = wait_time
   _character.move_direction = Vector2.ZERO
   _character.act('idle')
+
+# Skip to the next command.
+func go_next():
+  _queue.execute()
 
 # Ensure the navigation server is ready to receive requests.
 func _check_server_status() -> void:

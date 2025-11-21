@@ -52,11 +52,20 @@ static func rush(
     #_run_to(ai_target.position + Vector2(10, 10))
 
 
-# Checks if the target is in range and strikes if they are.
-func careful_strike(target: AiTarget, tolerable_distance: float) -> Callable:
+# Checks if the target is in range and only strikes if they are.
+# Requires directional sense on the character.
+static func careful_strike(target: AiTarget) -> Callable:
   return func (ai_controller: AiController):
-    if (target.position - ai_controller.position).length() <= tolerable_distance:
-      pass
+    var sense = ai_controller.character.attack_sense
+    if sense:
+      var direction = sense.where_target(target.controller)
+      if direction:
+        ai_controller.character.turn(direction)
+        ai_controller.character.act('light_attack')
+        return
+    
+    ai_controller.go_next()
+
 
 func _stalk(target: AiTarget):
   var target_position = target.position

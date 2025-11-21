@@ -31,4 +31,3 @@ func _process(_delta: float) -> void:
         )
       else:
         _character.move_direction = Vector2.ZERO
-        _character.act('idle')

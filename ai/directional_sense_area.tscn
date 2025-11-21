@@ -1,0 +1,22 @@
+[gd_scene load_steps=2 format=3 uid="uid://b51jmnlt8dctt"]
+
+[ext_resource type="Script" uid="uid://dglw2gtgcn0d4" path="res://ai/directional_sense_area.gd" id="1_hscnk"]
+
+[node name="DirectionalSenseArea" type="Node2D"]
+script = ExtResource("1_hscnk")
+
+[node name="Up" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 4
+
+[node name="Down" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 4
+
+[node name="Left" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 4
+
+[node name="Right" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 4
