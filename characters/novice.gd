@@ -6,6 +6,7 @@ static var _light_attack_modifier_rng = NormalDistRange.new(0.64, 0.2, 0.0, 0.79
 static var _heavy_attack_modifier_rng = NormalDistRange.new(0.64, 0.2, 0.0, 0.79)
 static var _charge_attack_modifier_rng = NormalDistRange.new(0.64, 0.2, 0.0, 0.79)
 
+
 func _ready() -> void:
   super._ready()
 
@@ -40,12 +41,12 @@ func trigger_charge_attack() -> void:
 func _process_additional_actions(action: String) -> bool:
   match(action):
     'heavy_attack':
-      move_direction = Vector2.ZERO
-      smooth_play('heavy_attack_%s' % _face_direction)
+      _move_direction = Vector2.ZERO
+      _smooth_play('heavy_attack_%s' % _face_direction)
       return true
     'charge_attack':
-      move_direction = Vector2.ZERO
-      smooth_play('charge_attack_%s' % _face_direction)
+      _move_direction = Vector2.ZERO
+      _smooth_play('charge_attack_%s' % _face_direction)
       return true
     _:
       return false

@@ -69,7 +69,7 @@ static func careful_strike(target: AiTarget) -> Callable:
 
 func _stalk(target: AiTarget):
   var target_position = target.position
-  var target_face_direction = target.controller.character.move_direction
+  #var target_face_direction = target.controller.character.act('walk', Vector2.ZERO)
   
   pass
 

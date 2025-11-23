@@ -1,8 +1,10 @@
 class_name Player
 extends Controller
 
+
 func _ready() -> void:
   super._ready()
+
 
 func _process(_delta: float) -> void:
   if _character:
@@ -23,11 +25,11 @@ func _process(_delta: float) -> void:
       elif Input.is_action_pressed('charge_attack'):
         _character.act('charge_attack')
       elif move.length() > 0:
-        _character.move_direction = move
         _character.act(
           'run'
           if Input.is_action_pressed('run')
-          else 'walk'
+          else 'walk',
+          move,
         )
       else:
-        _character.move_direction = Vector2.ZERO
+        _character.act('idle')

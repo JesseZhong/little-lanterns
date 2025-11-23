@@ -4,7 +4,6 @@ extends Controller
 
 signal done_waiting()
 
-
 const DEFAULT_WAIT_TIME = 0.1
 
 var nav_agent: NavigationAgent2D:
@@ -37,14 +36,14 @@ func _ready() -> void:
   # This callback ensures that when a character reaches its destination
   # as part of a command, it should reset animation and execute the next
   # command in queue.
-  _agent.navigation_finished.connect(
-    func ():
-      _character.act('idle')
-      _queue.execute()
-  )
+  # _agent.navigation_finished.connect(
+  #   func ():
+  #     _character.act('idle')
+  #     _queue.execute()
+  # )
 
   # Finally, this one handles when waiting commands end. Triggers the next.
-  done_waiting.connect(_queue.execute)
+  #done_waiting.connect(_queue.execute)
 
 
 func _process(delta: float) -> void:
@@ -85,7 +84,7 @@ func _physics_process(_delta: float) -> void:
     return
   
   # Continue pointing the character towards the destination.
-  _character.move_direction = _character.position.direction_to(_agent.get_next_path_position())
+  _character._move_direction = _character.position.direction_to(_agent.get_next_path_position())
 
 
 func setup(
@@ -121,12 +120,14 @@ func setup(
 # Forces character to idly wait for a certain amount of time.
 func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
   _wait_time = wait_time
-  _character.move_direction = Vector2.ZERO
+  _character._move_direction = Vector2.ZERO
   _character.act('idle')
+
 
 # Skip to the next command.
 func go_next():
   _queue.execute()
+
 
 # Ensure the navigation server is ready to receive requests.
 func _check_server_status() -> void:
