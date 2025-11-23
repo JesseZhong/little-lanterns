@@ -12,10 +12,10 @@ var nav_agent: NavigationAgent2D:
 var waiting: bool:
   get: return _wait_time > 0
 
+var _move_type: String = ''
 var _agent: NavigationAgent2D
 var _server_ready: bool = false
 var _wait_time: float = 0
-
 var _attention: AiAttention
 var _current_target: Variant # "nullable" NodePath
 var _queue: AiCommandQueue
@@ -36,14 +36,10 @@ func _ready() -> void:
   # This callback ensures that when a character reaches its destination
   # as part of a command, it should reset animation and execute the next
   # command in queue.
-  # _agent.navigation_finished.connect(
-  #   func ():
-  #     _character.act('idle')
-  #     _queue.execute()
-  # )
+  _agent.navigation_finished.connect(_queue.execute)
 
   # Finally, this one handles when waiting commands end. Triggers the next.
-  #done_waiting.connect(_queue.execute)
+  done_waiting.connect(_queue.execute)
 
 
 func _process(delta: float) -> void:
@@ -81,10 +77,14 @@ func _physics_process(_delta: float) -> void:
 
   # Stop moving once the destination is reached.
   if _agent.is_navigation_finished():
+    _character.act('idle')
     return
-  
+
   # Continue pointing the character towards the destination.
-  _character._move_direction = _character.position.direction_to(_agent.get_next_path_position())
+  _character.act(
+    _move_type,
+    _character.position.direction_to(_agent.get_next_path_position())
+  )
 
 
 func setup(
@@ -117,10 +117,17 @@ func setup(
   _attention.first_target_entered.connect(_queue.clear_queue)
 
 
+func move_to(
+  target_position: Vector2,
+  move_type: String,
+) -> void:
+  _agent.target_position = target_position
+  _move_type = move_type
+
+
 # Forces character to idly wait for a certain amount of time.
 func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
   _wait_time = wait_time
-  _character._move_direction = Vector2.ZERO
   _character.act('idle')
 
 

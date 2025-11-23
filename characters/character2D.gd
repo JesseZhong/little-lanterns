@@ -1,7 +1,6 @@
 @abstract class_name Character2D
 extends CharacterBody2D
 
-signal action_started(action_name: String)
 signal action_ended(action_name: String)
 signal get_hit(origin_position: Vector2)
 
@@ -69,7 +68,7 @@ func _ready() -> void:
   # attempt to reset the animation idle, run, or walk.
   _anim_player.animation_finished.connect(
     func (_anim_name):
-      pass
+      action_ended.emit(current_action)
   )
 
 
@@ -94,12 +93,6 @@ func _process(_delta: float) -> void:
       _:
         if not _process_additional_actions(_queued_action):
           _idle()
-
-    # Unlike animations, even if the previous action
-    # is the same as the new action, they don't count
-    # as a single continuous action.
-    action_started.emit(_queued_action)
-    action_ended.emit(_current_action)
 
     # Set as current.
     _current_action = _queued_action

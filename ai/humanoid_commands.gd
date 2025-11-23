@@ -2,19 +2,6 @@ class_name HumanoidCommands
 
 const STEP_DISTANCE = 5.3
 
-static func walk_to(
-  target_position: Vector2
-) -> Callable:
-  return func (ai_controller):
-    ai_controller.nav_agent.target_position = target_position
-    ai_controller.character.act('walk')
-
-static func run_to(
-  target_position: Vector2
-) -> Callable:
-  return func (ai_controller):
-    ai_controller.nav_agent.target_position = target_position
-    ai_controller.character.act('run')
 
 ## Have character walk to a random location near the patrol point.
 static func patrol_wander(
@@ -34,12 +21,16 @@ static func patrol_wander(
       var direction = randf_range(
         -half_fan_angle, half_fan_angle
       ) + angle_to_patrol_point
-      walk_to(VectorMath.extend(
-        ai_controller.position,
-        walk_distance,
-        direction
-      )).call(ai_controller)
+      ai_controller.move_to(
+        VectorMath.extend(
+          ai_controller.position,
+          walk_distance,
+          direction
+        ),
+        'walk',
+      )
   ]
+
 
 ## Close in on the target, from an angle that can be attacked from.
 static func rush(
@@ -73,12 +64,13 @@ func _stalk(target: AiTarget):
   
   pass
 
+
 static func circle(
   ai_controller: AiController,
   target: AiTarget,
   distance: float,
   clockwise: bool,
-  run: bool
+  move_type: String,
 ) -> Array[Callable]:
   assert(distance > 0, '')
 
@@ -103,7 +95,9 @@ static func circle(
   # Populate movement commands.
   assert(steps == len(path))
   for destination in path:
-    var method = run_to if run else walk_to
-    result.append(method.call(destination))
+    result.append(
+      func (ac: AiController):
+        ac.move_to(destination, move_type)
+    )
 
   return result
