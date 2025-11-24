@@ -3,6 +3,7 @@ extends CharacterBody2D
 
 signal action_ended(action_name: String)
 signal get_hit(origin_position: Vector2)
+signal collided()
 
 ## Default Z-Index of characters.
 const CHARACTER_PLANE: int = 20
@@ -106,7 +107,8 @@ func _physics_process(delta: float) -> void:
   if _character_condition:
     var movement = _move_direction.normalized() * _move_speed * delta
     movement.y *= Y_MOVEMENT_SCALE # Scale down Y movement due to perspective.
-    move_and_collide(movement)
+    if move_and_collide(movement):
+      collided.emit()
 
 
 func setup(

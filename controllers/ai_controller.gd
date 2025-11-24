@@ -31,7 +31,7 @@ func _ready() -> void:
 
   # This callback ensures that non-looping (not 'idle' or 'move')
   # animations trigger the next command in queue when finished.
-  _character.action_ended.connect(func (_action: String): _queue.execute())
+  _character.action_ended.connect(func (_action): _queue.execute())
 
   # This callback ensures that when a character reaches its destination
   # as part of a command, it should reset animation and execute the next
@@ -40,6 +40,20 @@ func _ready() -> void:
 
   # Finally, this one handles when waiting commands end. Triggers the next.
   done_waiting.connect(_queue.execute)
+
+  # When hit, forget what was planned next.
+  _character.get_hit.connect(
+    func (_origin):
+      _queue.clear_queue()
+  )
+
+  # When collided, stop, clear action queue,
+  # and force the AI to reassess the situation.
+  _character.collided.connect(
+    func ():
+      _character.act('idle')
+      _queue.clear_queue()
+  )
 
 
 func _process(delta: float) -> void:
@@ -101,7 +115,8 @@ func setup(
   _attention = AiAttention.new(
     own_character,
     args[0],
-    args[1]
+    args[1],
+    faction,
   )
 
   assert(

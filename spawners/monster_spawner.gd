@@ -6,7 +6,7 @@ func spawn(
   spawn_location: Vector2,
   character_name: String,
   character_stats: CharacterStats,
-  _options: Dictionary[String, Variant] = {}
+  options: Dictionary[String, Variant] = {}
 ):
   # Ensure character stats are valid.
   assert(character_stats, 'Valid character stats required for spawning.')
@@ -31,9 +31,10 @@ func spawn(
     character.setup(spawn_location, condition)
     character.add_child(agent)
 
-    # Initialize a new AI controller
+    # Initialize a new AI controller, set faction,
     # and attach the character and agent.
     var controller: Controller = controller_scene.instantiate()
+    controller.faction = options.get('faction', '')
     controller.setup(character, condition, agent)
     
     # Attach stats, condition, and character.
@@ -46,6 +47,7 @@ func spawn(
     
     # Finally, add to scene.
     world.add_child(controller)
+
 
 func _get_character_scene(character_name: String) -> Array:
   # https://docs.godotengine.org/en/stable/classes/class_%40gdscript.html#class-gdscript-method-load

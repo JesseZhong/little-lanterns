@@ -28,9 +28,10 @@ func spawn(
     var character: Character2D = character_scene.instantiate()
     character.setup(spawn_location, condition)
 
-    # Initialize a new player controller
-    # and attach the character scene.
+    # Initialize a new player controller, set faction,
+    # and attach the character instance and condition.
     var player: Player = player_scene.instantiate()
+    player.faction = options.get('faction', '')
     player.setup(character, condition)
     
     # Attach stats, condition, and character.

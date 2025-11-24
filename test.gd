@@ -24,12 +24,45 @@ func _ready() -> void:
   
   monster_spawner.spawn(
     self,
-    Vector2(45, 12),
+    Vector2(320, 12),
     'orc',
     CharacterStats.new(
       400,
       80,
       1.2,
       43
-    )
+    ),
+    {
+      'faction': 'orcs'
+    }
+  )
+
+  monster_spawner.spawn(
+    self,
+    Vector2(310, 70),
+    'orc',
+    CharacterStats.new(
+      450,
+      86,
+      1.1,
+      48
+    ),
+    {
+      'faction': 'orcs'
+    }
+  )
+
+  monster_spawner.spawn(
+    self,
+    Vector2(334, 54),
+    'orc',
+    CharacterStats.new(
+      430,
+      82,
+      1.21,
+      41
+    ),
+    {
+      'faction': 'orcs'
+    }
   )
