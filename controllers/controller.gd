@@ -19,6 +19,7 @@ func _ready() -> void:
   # Enable Y-Sorting to draw furthest characters first.
   y_sort_enabled = true
 
+
 func setup(
   own_character: Character2D,
   own_condition: CharacterCondition,

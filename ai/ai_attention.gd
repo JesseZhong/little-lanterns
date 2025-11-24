@@ -11,15 +11,6 @@ signal ally_exited()
 signal first_target_entered()
 signal last_target_exited()
 
-
-enum CollisionLayers {
-  TERRAIN = 1,
-  CHARACTER_LOWER,
-  CHARACTER_UPPER,
-  ABILITIES,
-  AI,
-}
-
 var has_targets: bool:
   get: return len(_targets) > 0
 
@@ -65,11 +56,11 @@ func _setup_ai_area(
   shape.radius = radius
   collision.shape = shape
   area.add_child(collision)
-  area.set_collision_layer_value(CollisionLayers.TERRAIN, false)
-  area.set_collision_layer_value(CollisionLayers.AI, true)
-  area.set_collision_mask_value(CollisionLayers.TERRAIN, false)
-  area.set_collision_mask_value(CollisionLayers.CHARACTER_LOWER, true)
-  area.set_collision_mask_value(CollisionLayers.ABILITIES, true)
+  area.set_collision_layer_value(Collision.Layers.TERRAIN, false)
+  area.set_collision_layer_value(Collision.Layers.AI, true)
+  area.set_collision_mask_value(Collision.Layers.TERRAIN, false)
+  area.set_collision_mask_value(Collision.Layers.CHARACTER_LOWER, true)
+  area.set_collision_mask_value(Collision.Layers.ABILITIES, true)
   area.monitorable = false # Should not be "visible" to physics.
   return area
 

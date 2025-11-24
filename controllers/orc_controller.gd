@@ -82,10 +82,10 @@ func _weigh_target(key: NodePath, data: AiTarget, delta_since: float) -> void:
 
 
 func _idle():
-  _queue.do(HumanoidCommands.patrol_wander(
+  _queue.do(HumanoidCommands.wander_patrol(
     _patrol_target,
     _walk_distance_rng.value,
-    PI,
+    PI * 0.7,
     _idle_interval_rng.value
   ))
 

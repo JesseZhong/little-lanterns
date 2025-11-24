@@ -14,7 +14,8 @@ var waiting: bool:
 
 var _move_type: String = ''
 var _agent: NavigationAgent2D
-var _server_ready: bool = false
+var _nav_server_ready: bool = false
+var _path_blocked: bool = false
 var _wait_time: float = 0
 var _attention: AiAttention
 var _current_target: Variant # "nullable" NodePath
@@ -33,11 +34,6 @@ func _ready() -> void:
   # animations trigger the next command in queue when finished.
   _character.action_ended.connect(func (_action): _queue.execute())
 
-  # This callback ensures that when a character reaches its destination
-  # as part of a command, it should reset animation and execute the next
-  # command in queue.
-  _agent.navigation_finished.connect(_queue.execute)
-
   # Finally, this one handles when waiting commands end. Triggers the next.
   done_waiting.connect(_queue.execute)
 
@@ -51,7 +47,7 @@ func _ready() -> void:
   # and force the AI to reassess the situation.
   _character.collided.connect(
     func ():
-      _character.act('idle')
+      _path_blocked = true
       _queue.clear_queue()
   )
 
@@ -60,7 +56,7 @@ func _process(delta: float) -> void:
   _advance_time(delta)
 
   # No targets? Do your own thang.
-  if !_attention.has_targets and _character.is_idle and !waiting:
+  if !_attention.has_targets and _character.is_idle and !waiting and !_queue.has_commands:
     _idle()
 
   if _attention.has_targets:
@@ -86,11 +82,11 @@ func _process(delta: float) -> void:
     
 
 func _physics_process(_delta: float) -> void:
-  if not _server_ready or not _agent:
+  if not _nav_server_ready or not _agent:
     return
 
   # Stop moving once the destination is reached.
-  if _agent.is_navigation_finished():
+  if _agent.is_navigation_finished() or _path_blocked:
     _character.act('idle')
     return
 
@@ -124,12 +120,19 @@ func setup(
     'AI controller setup requires a valid navigation agent.'
   )
   _agent = args[2] as NavigationAgent2D
+  _agent.avoidance_layers = Collision.Layers.CHARACTER_LOWER
+  _agent.set_avoidance_mask_value(Collision.Layers.CHARACTER_LOWER, true)
+  _agent.set_avoidance_mask_value(Collision.Layers.ABILITIES, true)
+  _agent.set_avoidance_mask_value(Collision.Layers.TERRAIN, false)
+  _agent.navigation_layers = Collision.Layers.TERRAIN
 
   # Setup the command queue.
   _queue = AiCommandQueue.new(self)
 
   # Clear any idle commands on target enter.
   _attention.first_target_entered.connect(_queue.clear_queue)
+
+  _agent.debug_enabled = true
 
 
 func move_to(
@@ -138,6 +141,7 @@ func move_to(
 ) -> void:
   _agent.target_position = target_position
   _move_type = move_type
+  _path_blocked = false
 
 
 # Forces character to idly wait for a certain amount of time.
@@ -154,7 +158,7 @@ func go_next():
 # Ensure the navigation server is ready to receive requests.
 func _check_server_status() -> void:
   await get_tree().physics_frame
-  _server_ready = true
+  _nav_server_ready = true
 
 
 ## Advance internal timers forward by the simulation delta.

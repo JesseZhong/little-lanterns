@@ -52,6 +52,7 @@ func do(command_s: Variant, now = false) -> void:
       clear_queue()
 
       # Grab first command to execute now.
+      list.reverse()
       var first_command = list.pop_back()
 
       # Queue the rest.

@@ -4,7 +4,7 @@ const STEP_DISTANCE = 5.3
 
 
 ## Have character walk to a random location near the patrol point.
-static func patrol_wander(
+static func wander_patrol(
   target_position: Vector2,
   walk_distance: float,
   fan_angle: float,
@@ -16,16 +16,16 @@ static func patrol_wander(
 
     # Walk randomly around target position.
     func (ai_controller: AiController):
-      var angle_to_patrol_point = ai_controller.position.angle_to(target_position)
+      var angle_to_patrol_point = (target_position - ai_controller.character.position).angle()
       var half_fan_angle = fan_angle / 2
       var direction = randf_range(
         -half_fan_angle, half_fan_angle
       ) + angle_to_patrol_point
       ai_controller.move_to(
         VectorMath.extend(
-          ai_controller.position,
+          ai_controller.character.position,
           walk_distance,
-          direction
+          direction,
         ),
         'walk',
       )
@@ -38,7 +38,7 @@ static func rush(
   offset: Vector2,
 ) -> Callable:
   return func (ai_controller: AiController):
-    var angle_of_approach = target.position - ai_controller.position
+    var angle_of_approach = target.position - ai_controller.character.position
 
     #_run_to(ai_target.position + Vector2(10, 10))
 
@@ -81,7 +81,7 @@ static func circle(
 
   # Quick maths.
   var center = target.position
-  var radius = (ai_controller.position - target.position).length()
+  var radius = (ai_controller.character.position - target.position).length()
   var travel_angle = distance / radius * (-1 if clockwise else 1)
   var step_angle = travel_angle / steps
 
