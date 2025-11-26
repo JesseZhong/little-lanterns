@@ -31,7 +31,13 @@ func clear_queue() -> void:
 
 func do(command_s: Variant, now = false) -> void:
   assert(command_s, 'Cannot queue null command(s).')
-  assert(command_s is Callable or command_s is Array[Callable], 'Argument must be a command or list of commands.')
+  assert(
+    command_s is Callable or
+    command_s is Array[Callable] or
+    # For untyped/ambiguous arrays.
+    (command_s is Array and command_s.all(func(x): return x is Callable)),
+    'Argument must be a command or list of commands.'
+  )
 
   if command_s is Callable:
     var single = command_s as Callable
@@ -52,8 +58,7 @@ func do(command_s: Variant, now = false) -> void:
       clear_queue()
 
       # Grab first command to execute now.
-      list.reverse()
-      var first_command = list.pop_back()
+      var first_command = list.pop_front()
 
       # Queue the rest.
       _queue.append_array(list)
