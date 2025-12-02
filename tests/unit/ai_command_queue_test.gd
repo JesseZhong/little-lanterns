@@ -33,7 +33,7 @@ func before_each():
 
 
 func test_do__empty_list__add_single():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
 
   _queue.do(callback.method)
 
@@ -43,9 +43,9 @@ func test_do__empty_list__add_single():
 
 
 func test_do__existing_list__add_single():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -68,7 +68,7 @@ func test_do__existing_list__add_single():
 
 
 func test_do_now__empty_list__add_single():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
 
   _queue.do(callback.method, true)
 
@@ -78,9 +78,9 @@ func test_do_now__empty_list__add_single():
 
 
 func test_do_now__existing_list__add_single():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -96,7 +96,7 @@ func test_do_now__existing_list__add_single():
 
 
 func test_do__empty_list__add_list_single():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
   var commands = [callback.method]
 
   _queue.do(commands)
@@ -107,9 +107,9 @@ func test_do__empty_list__add_list_single():
 
 
 func test_do__empty_list__add_list_many():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   var commands = [
     callback_1.method,
     callback_2.method,
@@ -132,9 +132,9 @@ func test_do__empty_list__add_list_many():
 
 
 func test_do__existing_list__add_list_single():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -158,11 +158,11 @@ func test_do__existing_list__add_list_single():
 
 
 func test_do__existing_list__add_list_many():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
-  var callback_4 = double(Callback).new()
-  var callback_5 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
+  var callback_4 = partial_double(Callback).new()
+  var callback_5 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -194,7 +194,7 @@ func test_do__existing_list__add_list_many():
 
 
 func test_do_now__empty_list__add_list_single():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
   var commands = [callback.method]
 
   _queue.do(commands, true)
@@ -205,9 +205,9 @@ func test_do_now__empty_list__add_list_single():
 
 
 func test_do_now__empty_list__add_list_many():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   var commands = [
     callback_1.method,
     callback_2.method,
@@ -230,9 +230,9 @@ func test_do_now__empty_list__add_list_many():
 
 
 func test_do_now__existing_list__add_list_single():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -249,11 +249,11 @@ func test_do_now__existing_list__add_list_single():
 
 
 func test_do_now__existing_list__add_list_many():
-  var callback_1 = double(Callback).new()
-  var callback_2 = double(Callback).new()
-  var callback_3 = double(Callback).new()
-  var callback_4 = double(Callback).new()
-  var callback_5 = double(Callback).new()
+  var callback_1 = partial_double(Callback).new()
+  var callback_2 = partial_double(Callback).new()
+  var callback_3 = partial_double(Callback).new()
+  var callback_4 = partial_double(Callback).new()
+  var callback_5 = partial_double(Callback).new()
   _queue._queue = [
     callback_1.method,
     callback_2.method,
@@ -281,7 +281,7 @@ func test_do_now__existing_list__add_list_many():
 
 
 func test_execute__list_single():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
   _queue._queue = [callback.method]
 
   _queue.execute()
@@ -292,7 +292,7 @@ func test_execute__list_single():
 
 
 func test_execute__list_many():
-  var callback = double(Callback).new()
+  var callback = partial_double(Callback).new()
   _queue._queue = [
     callback.method,
     func (_ai): pass,
@@ -357,6 +357,8 @@ class StubAiController extends AiController:
   ) -> void:
     _character = own_character
     _condition = own_condition
+    _agent = NavigationAgent2D.new()
+    add_child(_agent)
 
   func _weigh_target(_key: NodePath, _data: AiTarget, _delta: float) -> void:
     pass
@@ -370,4 +372,4 @@ class StubAiController extends AiController:
 
 class Callback extends RefCounted:
   func method(_ac):
-    pass
+    return AiConstants.EndConditions.ANIMATION_COMPLETED
