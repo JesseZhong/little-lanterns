@@ -2,21 +2,21 @@ class_name CharacterCondition
 extends Node
 
 signal health_changed
-signal death()
+signal death
 
 var character_stats: CharacterStats
 
 var walk_speed: float:
-  get:
-    if not movement_speed:
-      return 0.0
-    return movement_speed.value
+	get:
+		if not movement_speed:
+			return 0.0
+		return movement_speed.value
 
 var run_speed: float:
-  get:
-    if not movement_speed or not run_modifier:
-      return 0.0
-    return movement_speed.value * run_modifier.value
+	get:
+		if not movement_speed or not run_modifier:
+			return 0.0
+		return movement_speed.value * run_modifier.value
 
 var movement_speed: Stat
 
@@ -29,66 +29,69 @@ var max_hp: Stat
 ## HP changes trigger [health_changed].
 ## Value reaching 0 triggers [death].
 var current_hp: int:
-  get:
-    return _current_hp
-  set(value):
-    var previous_hp = _current_hp
-    _current_hp = clamp(value, 0, max_hp.value)
-    
-    if previous_hp != _current_hp:
-      health_changed.emit(previous_hp, current_hp)
-    
-    if _current_hp <= 0 and _current_hp != previous_hp:
-      death.emit()
-      
+	get:
+		return _current_hp
+	set(value):
+		var previous_hp = _current_hp
+		_current_hp = clamp(value, 0, max_hp.value)
+
+		if previous_hp != _current_hp:
+			health_changed.emit(previous_hp, current_hp)
+
+		if _current_hp <= 0 and _current_hp != previous_hp:
+			death.emit()
+
 var isAlive: bool:
-  get:
-    if current_hp:
-      return current_hp > 0
-    return false
-    
+	get:
+		if current_hp:
+			return current_hp > 0
+		return false
+
 var isDead: bool:
-  get:
-    if current_hp:
-      return current_hp <= 0
-    return false
-    
+	get:
+		if current_hp:
+			return current_hp <= 0
+		return false
+
 var attack: Stat
 
 var has_super_armor: bool = false
 
 var _current_hp: int
 
+
 func _init(stats: CharacterStats) -> void:
-  assert(stats is CharacterStats, 'Invalid character stats passed to character condition.')
-  
-  character_stats = stats
-  movement_speed = Stat.new(stats, func(s: CharacterStats): return s.movement_speed)
-  run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
-  max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
-  attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
-  _current_hp = max_hp.value
+	assert(stats is CharacterStats, 'Invalid character stats passed to character condition.')
+
+	character_stats = stats
+	movement_speed = Stat.new(stats, func(s: CharacterStats): return s.movement_speed)
+	run_modifier = Stat.new(stats, func(s: CharacterStats): return s.run_modifier)
+	max_hp = Stat.new(stats, func(s: CharacterStats): return s.max_hp)
+	attack = Stat.new(stats, func(s: CharacterStats): return s.attack)
+	_current_hp = max_hp.value
+
 
 ## Maintains a mutable character stat.
-class Stat extends RefCounted:
-  var _stats: CharacterStats
-  var _property: Callable
-  var _effects: Dictionary[String, Callable]
-  
-  func _init(stats: CharacterStats, property: Callable) -> void:
-    _stats = stats
-    _property = property
-    _effects = {}
-    
-  var value: Variant:
-    get:
-      var val = _property.call(_stats)
-      for effect_name in _effects:
-        val = _effects[effect_name].call(val)
-      return val
-      
-  func register_effect(name: String, effect: Callable):
-    _effects.set(name, effect)
-    
-  func unregister_effect(name: String):
-    _effects.erase(name)
+class Stat:
+	extends RefCounted
+	var _stats: CharacterStats
+	var _property: Callable
+	var _effects: Dictionary[String, Callable]
+
+	func _init(stats: CharacterStats, property: Callable) -> void:
+		_stats = stats
+		_property = property
+		_effects = {}
+
+	var value: Variant:
+		get:
+			var val = _property.call(_stats)
+			for effect_name in _effects:
+				val = _effects[effect_name].call(val)
+			return val
+
+	func register_effect(name: String, effect: Callable):
+		_effects.set(name, effect)
+
+	func unregister_effect(name: String):
+		_effects.erase(name)

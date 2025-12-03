@@ -6,24 +6,22 @@ extends Camera2D
 # and update the camera's position.
 var _target_transform: RemoteTransform2D
 
-func _init(
-  target: Node2D,
-  enable_camera: bool,
-  start_zoom: Vector2
-) -> void:
-  assert(target is Node2D, 'Invalid follow camera target.')
-  
-  # Setup the transform and attach it to the target.
-  _target_transform = RemoteTransform2D.new()
-  _target_transform.update_rotation = false
-  target.add_child(_target_transform)
-  
-  enabled = enable_camera
-  zoom = start_zoom
-  
-  add_to_group('follow_cameras')
-  
+
+func _init(target: Node2D, enable_camera: bool, start_zoom: Vector2) -> void:
+	assert(target is Node2D, 'Invalid follow camera target.')
+
+	# Setup the transform and attach it to the target.
+	_target_transform = RemoteTransform2D.new()
+	_target_transform.update_rotation = false
+	target.add_child(_target_transform)
+
+	enabled = enable_camera
+	zoom = start_zoom
+
+	add_to_group('follow_cameras')
+
+
 # Once the camera is available in the scene tree,
 # pass its path to the remote transform.
 func _ready() -> void:
-  _target_transform.remote_path = get_path()
+	_target_transform.remote_path = get_path()

@@ -1,8 +1,8 @@
 extends AiController
 
 const ATTENTION = {
-  range = 220,
-  low_att_dist = 140,
+	range = 220,
+	low_att_dist = 140,
 }
 
 static var _scan_range_rng = NormalDistRange.new(120, 2.4, 112, 128)
@@ -20,78 +20,82 @@ var _patrol_target: Vector2
 
 
 func _ready() -> void:
-  super._ready()
+	super._ready()
 
 
-func setup(
-  own_character: Character2D,
-  own_condition: CharacterCondition,
-  ...args
-):
-  # Variadic arguments currently don't have a spread operator
-  # to compliment it. The workaround is to use `callv` to pass
-  # the arguments. Unfortunately, this is the only way to 
-  # convert a base/super method into a callable.
-  # See: https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#variadic-functions
-  var base_setup = func (params):
-    super.setup(
-      own_character,
-      own_condition,
-      # Create the monitoring areas.
-      _scan_range_rng.value,
-      _attention_range_rng.value,
-      params,
-    )
-  base_setup.callv(args)
-  _patrol_target = own_character.position
+func setup(own_character: Character2D, own_condition: CharacterCondition, ...args):
+	# Variadic arguments currently don't have a spread operator
+	# to compliment it. The workaround is to use `callv` to pass
+	# the arguments. Unfortunately, this is the only way to
+	# convert a base/super method into a callable.
+	# See: https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#variadic-functions
+	var base_setup = func(params):
+		(
+			super
+			. setup(
+				own_character,
+				own_condition,
+				# Create the monitoring areas.
+				_scan_range_rng.value,
+				_attention_range_rng.value,
+				params,
+			)
+		)
+	base_setup.callv(args)
+	_patrol_target = own_character.position
 
 
 func _weigh_target(key: NodePath, data: AiTarget, delta_since: float) -> void:
-  var weight = 0.0
-  var target_condition = data.condition
-  
-  # Precaution: If the target doesn't exist anymore, skip.
-  if not target_condition:
-    return
-  
-  # See how far the target is to this character.
-  # Weigh closer, higher. Also, weigh really far away higher.
-  var distance = (data.position as Vector2 - position).length()
-  var diff = distance - ATTENTION.low_att_dist
-  weight += (abs(diff) * _close_modifier_rng.value) \
-    if diff < 0 \
-    else _far_modifier_rng.value * diff
-  
-  # The lower the percentage health, higher attention.
-  var percent_hp = target_condition.current_hp / target_condition.max_hp.value
-  weight += (1 - percent_hp) * _hp_modifier_rng.value
-  
-  # Hits taken from target.
-  weight += data.hits_taken * _hits_modifier_rng.value
-  
-  # Damage taken from target.
-  weight += data.damage_taken * _damage_modifier_rng.value
-  
-  # If already current target, maybe maintain.
-  if _current_target == key:
-    weight += _keep_attention_rng.value
-    data.target_time += delta_since
-  
-  data.weight = weight
-  data.attention_time += delta_since
+	var weight = 0.0
+	var target_condition = data.condition
+
+	# Precaution: If the target doesn't exist anymore, skip.
+	if not target_condition:
+		return
+
+	# See how far the target is to this character.
+	# Weigh closer, higher. Also, weigh really far away higher.
+	var distance = (data.position as Vector2 - position).length()
+	var diff = distance - ATTENTION.low_att_dist
+	weight += (
+		(abs(diff) * _close_modifier_rng.value) if diff < 0 else _far_modifier_rng.value * diff
+	)
+
+	# The lower the percentage health, higher attention.
+	var percent_hp = target_condition.current_hp / target_condition.max_hp.value
+	weight += (1 - percent_hp) * _hp_modifier_rng.value
+
+	# Hits taken from target.
+	weight += data.hits_taken * _hits_modifier_rng.value
+
+	# Damage taken from target.
+	weight += data.damage_taken * _damage_modifier_rng.value
+
+	# If already current target, maybe maintain.
+	if _current_target == key:
+		weight += _keep_attention_rng.value
+		data.target_time += delta_since
+
+	data.weight = weight
+	data.attention_time += delta_since
 
 
 func _idle():
-  _queue.do(HumanoidCommands.wander_patrol(
-    _patrol_target,
-    _walk_distance_rng.value,
-    PI * 0.7,
-    _idle_interval_rng.value
-  ))
+	_queue.do(
+		HumanoidCommands.wander_patrol(
+			_patrol_target, _walk_distance_rng.value, PI * 0.7, _idle_interval_rng.value
+		)
+	)
 
 
 func _engage_target(ai_target: AiTarget, _delta: float) -> void:
-  if !_queue.has_commands:
-    _queue.do(HumanoidCommands.circle(self, ai_target.position, 200, true, 'run'))
-    #_queue.do(HumanoidCommands.careful_strike(ai_target))
-  pass
+	if !_queue.has_commands:
+		RNG.decide(
+			[
+				10.0,
+				func():
+					_queue.do(HumanoidCommands.circle(self, ai_target.position, 200, true, 'run'))
+					print('HELP')
+			],
+			[2.0, func(): _queue.do(HumanoidCommands.careful_strike(ai_target))]
+		)
