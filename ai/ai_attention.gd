@@ -72,7 +72,7 @@ func _on_alert(body: Node2D) -> void:
 
     # Ignore self.
     if controller and controller != self:
-      if controller.faction and controller.faction != _faction:
+      if not controller.faction or controller.faction != _faction:
         _targets[path] = AiTarget.new(controller)
 
         target_entered.emit()

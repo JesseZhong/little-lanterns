@@ -33,6 +33,9 @@ func execute() -> bool:
     if ai_action:
       _end_condition = ai_action.call(_ai_controller)
 
+      # Block other commands until this one finishes.
+      _executing = true
+
       # Emit that a command has started execution.
       command_executed.emit()
 
@@ -114,3 +117,9 @@ func try_finish(end_condition: AiConstants.EndConditions) -> bool:
     return true
 
   return false
+
+
+func force_finish():
+  if _executing:
+    _executing = false
+    command_finished.emit()

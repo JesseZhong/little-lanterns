@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"godotTools.editorPath.godot4": "/Applications/Godot.app",
+		"files.exclude": {
+			"addons/": true,
+			"**/.git": true,
+			"**/.svn": true,
+			"**/.hg": true,
+			"**/.DS_Store": true,
+			"**/Thumbs.db": true,
+			"**/.godot": true,
+			"**/*.gd.uid": true,
+			"**/*.png.import": true,
+			"**/*.png": true,
+			"**/*.tscn": true
+		}
+	}
+}
