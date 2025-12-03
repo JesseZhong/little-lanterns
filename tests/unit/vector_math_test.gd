@@ -12,7 +12,6 @@ var extend_vector_params = (
 	)
 )
 
-
 var calc_face_direction_params = (
 	ParameterFactory
 	. named_parameters(

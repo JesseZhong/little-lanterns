@@ -1,3 +1,4 @@
+# https://github.com/Scony/godot-gdscript-toolkit/wiki/3.-Linter
 class-definitions-order:
 - tools
 - classnames
