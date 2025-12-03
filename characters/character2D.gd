@@ -25,9 +25,6 @@ var movement_direction: Vector2:
 var current_action: String:
   get: return current_action
 
-var is_idle: bool:
-  get: return _current_action == 'idle'
-
 var condition: CharacterCondition:
   get:
     return _character_condition
@@ -119,13 +116,19 @@ func setup(
   _character_condition = own_condition
 
 
+## Attempt to perform an action and any associated movement.
 func act(action: String, movement: Vector2 = Vector2.ZERO) -> void:
   if !_block_anim and _queued_action != 'get_hit':
     _queued_action = action
     _move_direction = movement
 
 
-# Perform an in place face direction change.
+## Stop movement but not animation.
+func stop_moving():
+  _move_direction = Vector2.ZERO
+
+
+## Perform an in place face direction change.
 func turn(vector: Vector2) -> void:
   _face_direction = VectorMath.calc_face_direction(vector, true)
 

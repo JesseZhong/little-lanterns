@@ -1,6 +1,6 @@
 class_name HumanoidCommands
 
-const STEP_DISTANCE = 5.3
+const STEP_DISTANCE = 36
 
 
 ## Have character walk to a random location near the patrol point.
@@ -12,7 +12,8 @@ static func wander_patrol(
 ) -> Array[Callable]:
   return [
     func (ai_controller: AiController):
-      ai_controller.wait(pause_time),
+      ai_controller.wait(pause_time)
+      return AiConstants.EndConditions.WAITED,
 
     # Walk randomly around target position.
     func (ai_controller: AiController):
@@ -29,6 +30,7 @@ static func wander_patrol(
         ),
         'walk',
       )
+      return AiConstants.EndConditions.DESTINATION_REACHED,
   ]
 
 
@@ -56,6 +58,7 @@ static func careful_strike(target: AiTarget) -> Callable:
         return
     
     ai_controller.go_next()
+    return AiConstants.EndConditions.SKIPPED
 
 
 func _stalk(target: AiTarget):
@@ -67,7 +70,7 @@ func _stalk(target: AiTarget):
 
 static func circle(
   ai_controller: AiController,
-  target: AiTarget,
+  target_position: Vector2,
   distance: float,
   clockwise: bool,
   move_type: String,
@@ -80,14 +83,17 @@ static func circle(
   var result: Array[Callable] = []
 
   # Quick maths.
-  var center = target.position
-  var radius = (ai_controller.character.position - target.position).length()
+  var center = target_position
+  var position = ai_controller.character.position
+  var diff = position - center
+  var start_angle = diff.angle()
+  var radius = diff.length()
   var travel_angle = distance / radius * (-1 if clockwise else 1)
   var step_angle = travel_angle / steps
 
   # Calculate the path the character will take.
-  for i in range(steps):
-    var angle = step_angle * i
+  for i in range(1, steps + 1):
+    var angle = step_angle * i + start_angle
     var x = center.x + radius * cos(angle)
     var y = center.y + radius * sin(angle)
     path.append(Vector2(x, y))
@@ -98,6 +104,7 @@ static func circle(
     result.append(
       func (ac: AiController):
         ac.move_to(destination, move_type)
+        return AiConstants.EndConditions.DESTINATION_REACHED
     )
 
   return result

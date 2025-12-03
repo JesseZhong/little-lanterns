@@ -372,4 +372,4 @@ class StubAiController extends AiController:
 
 class Callback extends RefCounted:
   func method(_ac):
-    return AiConstants.EndConditions.ANIMATION_COMPLETED
+    return AiConstants.EndConditions.ACTION_COMPLETED

@@ -29,16 +29,9 @@ func _init(
 ## Returns whether a new command was executed or not.
 func execute() -> bool:
   if has_commands and !_executing:
-    var ai_action: Callable = _queue.pop_front()
-    if ai_action:
-      _end_condition = ai_action.call(_ai_controller)
-
-      # Block other commands until this one finishes.
-      _executing = true
-
-      # Emit that a command has started execution.
-      command_executed.emit()
-
+    var command: Callable = _queue.pop_front()
+    if command:
+      _execute(command)
       return true
 
   return false
@@ -67,13 +60,7 @@ func do(command_s: Variant, now = false) -> void:
     # Clear queue and execute now.
     if now or !has_commands:
       clear_queue()
-      _end_condition = single.call(_ai_controller)
-
-      # Block other commands from being executed until this one finishes.
-      _executing = true
-
-      # Emit that a command has started execution.
-      command_executed.emit()
+      _execute(single)
 
     # Already a queue? Wait.
     else:
@@ -90,21 +77,11 @@ func do(command_s: Variant, now = false) -> void:
       # Grab first command to execute now.
       var first_command = list.pop_front()
 
-      # Queue the rest.
-      _queue.append_array(list)
-
       # Execute the command.
-      _end_condition = first_command.call(_ai_controller)
+      _execute(first_command)
 
-      # Block other commands from executing until this one finishes.
-      _executing = true
-
-      # Emit that a command has started execution.
-      command_executed.emit()
-
-    # Throw them into the queue.
-    else:
-      _queue.append_array(list)
+    # Throw the rest into the queue.
+    _queue.append_array(list)
 
 
 ## Attempts to stop any executing command by passing an end condition.
@@ -112,14 +89,26 @@ func do(command_s: Variant, now = false) -> void:
 ## the command is resolved and a signal is emitted.
 func try_finish(end_condition: AiConstants.EndConditions) -> bool:
   if _executing and (end_condition == _end_condition or AiConstants.EndConditions.INTERRUPTED == end_condition):
-    _executing = false
-    command_finished.emit()
+    _finish()
     return true
-
   return false
 
 
 func force_finish():
   if _executing:
-    _executing = false
-    command_finished.emit()
+    _finish()
+
+
+func _execute(command: Callable):
+  _end_condition = command.call(_ai_controller)
+
+  # Block other commands from executing until this one finishes.
+  _executing = true
+
+  # Emit that a command has started execution.
+  command_executed.emit()
+
+
+func _finish():
+  _executing = false
+  command_finished.emit()
