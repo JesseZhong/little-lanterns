@@ -15,5 +15,4 @@ func trigger_light_attack() -> void:
 			func(target: Character2D) -> void:
 				var damage = _character_condition.attack.value * _light_attack_modifier_rng.value
 				target.condition.current_hp -= damage
-				pass
 		)

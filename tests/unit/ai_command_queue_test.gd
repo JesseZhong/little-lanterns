@@ -8,6 +8,27 @@ extends GutTest
 var _queue: AiCommandQueue
 var _ai_controller: AiController
 
+var _has_commands_params = ParameterFactory.named_parameters(
+	['commands', 'expected_result'],
+	[
+		[[], false],
+		[
+			[
+				func(_ai): pass,
+			],
+			true,
+		],
+		[
+			[
+				func(_ai): pass,
+				func(_ai): pass,
+				func(_ai): pass,
+			],
+			true,
+		]
+	]
+)
+
 
 func before_all():
 	# Register stub with GUT.
@@ -319,29 +340,7 @@ func test_clear_queue():
 	assert_true(_queue._queue.is_empty())
 
 
-var has_commands_params = ParameterFactory.named_parameters(
-	['commands', 'expected_result'],
-	[
-		[[], false],
-		[
-			[
-				func(_ai): pass,
-			],
-			true,
-		],
-		[
-			[
-				func(_ai): pass,
-				func(_ai): pass,
-				func(_ai): pass,
-			],
-			true,
-		]
-	]
-)
-
-
-func test_has_commands(params = use_parameters(has_commands_params)):
+func test_has_commands(params = use_parameters(_has_commands_params)):
 	_queue._queue = params.commands
 
 	assert_eq(_queue.has_commands, params.expected_result)

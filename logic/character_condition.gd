@@ -41,13 +41,13 @@ var current_hp: int:
 		if _current_hp <= 0 and _current_hp != previous_hp:
 			death.emit()
 
-var isAlive: bool:
+var is_alive: bool:
 	get:
 		if current_hp:
 			return current_hp > 0
 		return false
 
-var isDead: bool:
+var is_dead: bool:
 	get:
 		if current_hp:
 			return current_hp <= 0
@@ -74,6 +74,14 @@ func _init(stats: CharacterStats) -> void:
 ## Maintains a mutable character stat.
 class Stat:
 	extends RefCounted
+
+	var value: Variant:
+		get:
+			var val = _property.call(_stats)
+			for effect_name in _effects:
+				val = _effects[effect_name].call(val)
+			return val
+
 	var _stats: CharacterStats
 	var _property: Callable
 	var _effects: Dictionary[String, Callable]
@@ -82,13 +90,6 @@ class Stat:
 		_stats = stats
 		_property = property
 		_effects = {}
-
-	var value: Variant:
-		get:
-			var val = _property.call(_stats)
-			for effect_name in _effects:
-				val = _effects[effect_name].call(val)
-			return val
 
 	func register_effect(name: String, effect: Callable):
 		_effects.set(name, effect)

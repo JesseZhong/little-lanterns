@@ -13,8 +13,7 @@ static func calc_face_direction(vector: Vector2, name = false) -> Variant:
 	if normalized == Vector2.ZERO:
 		if name:
 			return 'down'
-		else:
-			return Vector2.DOWN
+		return Vector2.DOWN
 
 	var dot_down = normalized.dot(Vector2.DOWN)
 	var dot_up = normalized.dot(Vector2.UP)

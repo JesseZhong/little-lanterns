@@ -3,7 +3,7 @@ extends Spawner
 
 # https://docs.godotengine.org/en/stable/classes/class_%40gdscript.html#class-gdscript-method-preload
 # https://docs.godotengine.org/en/stable/tutorials/best_practices/logic_preferences.html#loading-vs-preloading
-const player_scene: PackedScene = preload('res://controllers/player.tscn')
+const PLAYER_SCENE: PackedScene = preload('res://controllers/player.tscn')
 
 
 func spawn(
@@ -22,8 +22,8 @@ func spawn(
 	if (
 		character_scene
 		and character_scene.can_instantiate()
-		and player_scene
-		and player_scene.can_instantiate()
+		and PLAYER_SCENE
+		and PLAYER_SCENE.can_instantiate()
 	):
 		var condition = CharacterCondition.new(character_stats)
 
@@ -32,7 +32,7 @@ func spawn(
 
 		# Initialize a new player controller, set faction,
 		# and attach the character instance and condition.
-		var player: Player = player_scene.instantiate()
+		var player: Player = PLAYER_SCENE.instantiate()
 		player.faction = options.get('faction', '')
 		player.setup(character, condition)
 

@@ -1,8 +1,6 @@
 class_name AiTarget
 extends RefCounted
 
-var _controller: Controller
-
 ## The controller of the target.
 var controller: Controller:
 	get:
@@ -38,6 +36,8 @@ var attention_time: float = 0
 
 ## Amount of time this target has been focused.
 var target_time: float = 0
+
+var _controller: Controller
 
 
 func _init(target_controller: Controller) -> void:

@@ -1,9 +1,9 @@
 extends Node
 
-var TILE_WIDTH = 32
-var TILE_LENGTH = 28
-var TILE_HEIGHT = 6
-var BASE_Z = -4
+const TILE_WIDTH = 32
+const TILE_LENGTH = 28
+const TILE_HEIGHT = 6
+const BASE_Z = -4
 
 @export var terrain_tile: PackedScene
 @export var layout: Array[Dictionary]
@@ -15,7 +15,7 @@ func _ready() -> void:
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	pass
 
 

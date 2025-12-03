@@ -31,16 +31,16 @@ func update_terrain():
 	$AnimatedSprite2D.animation = terrain_name
 
 
-func get_terrain_name(terrainType: String, terrainVariant: String) -> String:
+func get_terrain_name(type: String, variant: String) -> String:
 	var normalize = func() -> String:
-		match terrainType:
+		match type:
 			'earth', 'dirt':
 				return 'earth'
 			'grass', _:
 				return 'default'
 
 	return (
-		'{type}#{variant}'.format({'type': normalize.call(), 'variant': terrainVariant})
-		if terrainVariant
+		'{type}#{variant}'.format({'type': normalize.call(), 'variant': variant})
+		if variant
 		else normalize.call()
 	)

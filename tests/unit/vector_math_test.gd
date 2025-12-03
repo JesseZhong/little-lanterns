@@ -13,12 +13,6 @@ var extend_vector_params = (
 )
 
 
-func test_extend_vector(params = use_parameters(extend_vector_params)):
-	var result = VectorMath.extend(params.vector, params.length, params.angle)
-
-	assert_almost_eq(result, params.expected_result, Vector2(0.001, 0.001))
-
-
 var calc_face_direction_params = (
 	ParameterFactory
 	. named_parameters(
@@ -36,6 +30,12 @@ var calc_face_direction_params = (
 		]
 	)
 )
+
+
+func test_extend_vector(params = use_parameters(extend_vector_params)):
+	var result = VectorMath.extend(params.vector, params.length, params.angle)
+
+	assert_almost_eq(result, params.expected_result, Vector2(0.001, 0.001))
 
 
 func test_assert_calc_face_direction(params = use_parameters(calc_face_direction_params)):
