@@ -26,7 +26,6 @@ static func decide(...options):
 		weights.append(option[0])
 
 	var result = _instance._rng.rand_weighted(weights)
-	print(result)
 
-	if result > 0:
+	if result >= 0:
 		(options[result][1] as Callable).call()

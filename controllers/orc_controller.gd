@@ -93,9 +93,7 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 		RNG.decide(
 			[
 				10.0,
-				func():
-					_queue.do(HumanoidCommands.circle(self, ai_target.position, 200, true, 'run'))
-					print('HELP')
+				func(): _queue.do(HumanoidCommands.circle(self, ai_target.position, 200, true, 'run'))
 			],
 			[2.0, func(): _queue.do(HumanoidCommands.careful_strike(ai_target))]
 		)
