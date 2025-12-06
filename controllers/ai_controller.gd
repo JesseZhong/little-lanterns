@@ -5,6 +5,8 @@ signal done_waiting
 
 const DEFAULT_WAIT_TIME = 0.1
 
+static var _normal_distributed_range_rng_collection: Dictionary[String, NormalDistRange] = {}
+
 var nav_agent: NavigationAgent2D:
 	get:
 		return _agent
@@ -92,6 +94,20 @@ func _physics_process(_delta: float) -> void:
 
 	# Continue pointing the character towards the destination.
 	_character.act(_move_type, _character.position.direction_to(_agent.get_next_path_position()))
+
+
+## Populates the normal distribution range collection with values.
+static func load_normal_dists(collection: Dictionary[String, Array]) -> void:
+	for n in collection:
+		var a = collection[n]
+		assert(len(a) == 4)
+		_normal_distributed_range_rng_collection[n] = NormalDistRange.new(a[0], a[1], a[2], a[3])
+
+
+## Short hand generating a normal distribution value.
+static func d(distribution_name: String) -> float:
+	var dist = _normal_distributed_range_rng_collection.get(distribution_name)
+	return dist.value if dist else 0.0
 
 
 func setup(own_character: Character2D, own_condition: CharacterCondition, ...args) -> void:

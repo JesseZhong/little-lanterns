@@ -25,6 +25,10 @@ var position: Vector2:
 	get:
 		return controller.character.position
 
+var move_direction: Vector2:
+	get:
+		return controller.character.movement_direction
+
 ## Amount of hits taken from this target.
 var hits_taken: int = 0
 

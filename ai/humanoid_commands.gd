@@ -84,9 +84,20 @@ static func careful_strike(target: AiTarget) -> Callable:
 		return AiConstants.EndConditions.SKIPPED
 
 
-func _stalk(target: AiTarget):
-	var target_position = target.position
-	#var target_face_direction = target.controller.character.act('walk', Vector2.ZERO)
+static func stalk(target: AiTarget, distance: float):
+	return func (ai_controller: AiController):
+		var target_position = VectorMath.extend(
+			ai_controller.character.position,
+			distance,
+			target.move_direction.angle()
+		)
+
+		ai_controller.move_to(
+			target_position,
+			'walk'
+		)
+
+		return AiConstants.EndConditions.DESTINATION_REACHED
 
 
 static func circle(
