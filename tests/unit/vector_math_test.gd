@@ -30,6 +30,18 @@ var calc_face_direction_params = (
 	)
 )
 
+var relative_movement_params = (
+	ParameterFactory
+	. named_parameters(
+		['check_condition', 'a_position', 'b_position', 'a_velocity', 'b_velocity', 'expected_result'],
+		[
+			[VectorMath.RelativeMovement.Away, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, true],
+			[VectorMath.RelativeMovement.Away | VectorMath.RelativeMovement.Parallel, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, true],
+			[VectorMath.RelativeMovement.Toward | VectorMath.RelativeMovement.Parallel, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, false]
+		]
+	)
+)
+
 
 func test_extend_vector(params = use_parameters(extend_vector_params)):
 	var result = VectorMath.extend(params.vector, params.length, params.angle)
@@ -43,3 +55,15 @@ func test_assert_calc_face_direction(params = use_parameters(calc_face_direction
 
 	assert_eq(result1, params.expected_direction)
 	assert_eq(result2, params.expect_name)
+
+
+func test_relative_movement(params = use_parameters(relative_movement_params)):
+	var result = VectorMath.relative_movement(
+		params.check_condition,
+		params.a_position,
+		params.b_position,
+		params.a_velocity,
+		params.b_position,
+	)
+
+	assert_eq(result, params.expected_result)
