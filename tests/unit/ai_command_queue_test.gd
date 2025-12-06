@@ -328,14 +328,14 @@ func test_execute__list_many():
 	assert_eq(len(_queue._queue), 2)
 
 
-func test_clear_queue():
+func test_reset():
 	_queue._queue = [
 		func(_ai): pass,
 		func(_ai): pass,
 		func(_ai): pass,
 	]
 
-	_queue.clear_queue()
+	_queue.reset()
 
 	assert_true(_queue._queue.is_empty())
 
