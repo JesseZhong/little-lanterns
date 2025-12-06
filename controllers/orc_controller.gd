@@ -5,6 +5,8 @@ const ATTENTION = {
 	low_att_dist = 140,
 }
 
+const PARALLEL_THRESHOLD = 0.12
+
 var _patrol_target: Vector2
 
 static func _static_init():
@@ -29,10 +31,12 @@ static func _static_init():
 		'atk: approach distance' = [12, 0.58, 9, 15],
 		'atk: approach side variance' = [0, 1.5, -7, 7],
 		'atk: circling distance' = [32, 2.1, 25, 40],
-		'atk: evade distance' = [],
+		'atk: threat distance' = [24, 0.8, 20, 28],
+		'atk: evade distance' = [22, 1.15, 16, 27],
 
 		# Watch/assess.
-		'w: stalk distance' = [37, 5.8, 20, 60]
+		'w: stalking distance' = [37, 5.8, 20, 60],
+		'w: circling distance' = [54, 6.5, 30, 80]
 	})
 
 
@@ -107,48 +111,97 @@ func _idle():
 
 func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 	if !_queue.has_commands:
-		var move_direction = ai_target.move_direction
-		var current_position = _character.position
-		var distance = (current_position - ai_target.position).length()
+		var distance = (character.position - ai_target.position).length()
 
-		# Target not moving, walking away, or hasn't attacked in a while.
-		# Circle or stalk.
+		# Too far? Run closer.
+		if distance > ATTENTION.low_att_dist:
+			_queue.do(HumanoidCommands.approach(
+				ai_target,
+				distance - ATTENTION.low_att_dist,
+				'run'
+			))
 
+		# Target is walking away, try to walk parallel or circle.
+		if ai_target.move_direction != Vector2.ZERO and VectorMath.relative_movement(
+			VectorMath.RelativeMovement.Parallel,
+			PARALLEL_THRESHOLD,
+			ai_target.position,
+			character.position,
+			ai_target.move_direction
+		):
+			RNG.decide(
+				[
+					0.5,
+					func (): _queue.do(HumanoidCommands.circle(
+						self,
+						ai_target.position,
+						d('w: circling distance'),
+						RNG.coin_flip(),
+						'walk'
+					))
+				],
+				[
+					0.5,
+					func (): _queue.do(HumanoidCommands.stalk(
+						ai_target,
+						d('w: stalking distance')
+					))
+				]
+			)
 
 		# Target walking towards.
-		# Backstep and attack.
-
-		
-
+		# Backstep and attack or heavy attack.
+		elif distance < d('atk: threat distance') and VectorMath.relative_movement(
+			VectorMath.RelativeMovement.Toward,
+			PARALLEL_THRESHOLD,
+			ai_target.position,
+			character.position,
+			ai_target.move_direction
+		):
+			RNG.decide(
+				[
+					0.2,
+					func (): _queue.do(HumanoidCommands.evade_strike(
+						self,
+						ai_target,
+						d('atk: evade distance'),
+						'light_attack' if RNG.coin_flip() else 'heavy_attack'
+					))
+				],
+				[
+					0.8,
+					func (): _queue.do(HumanoidCommands.careful_strike(
+						ai_target,
+						'heavy_strike',
+					))
+				]
+			)
 
 		# Approach and attack.
-		RNG.decide(
-			[
-				0.5,
-				func (): _queue.do(HumanoidCommands.circle(
-					self,
-					ai_target.position,
-					d('atk: circling distance'),
-					true,
-					'run'
-				))
-			],
-			[
-				1.2,
-				func (): _queue.do(HumanoidCommands.stalk(
-					ai_target,
-					d('w: stalk distance')
-				))
-			],
-			[
-				2.0,
-				func (): _queue.do([
-					HumanoidCommands.rush(
-						ai_target,
-						d('atk: approach distance'),
-						d('atk: approach side variance')
-					),
-					HumanoidCommands.careful_strike(ai_target)
-				])
-			]
-		)
+		else:
+			RNG.decide(
+				[
+					0.5,
+					func (): _queue.do(HumanoidCommands.circle(
+						self,
+						ai_target.position,
+						d('atk: circling distance'),
+						RNG.coin_flip(),
+						'run'
+					))
+				],
+				[
+					2.0,
+					func (): _queue.do([
+						HumanoidCommands.rush(
+							ai_target,
+							d('atk: approach distance'),
+							d('atk: approach side variance')
+						),
+						HumanoidCommands.careful_strike(
+							ai_target,
+							'light_attack' if RNG.coin_flip() else 'heavy_attack'
+						)
+					])
+				]
+			)

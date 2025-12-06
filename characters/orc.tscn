@@ -259,7 +259,7 @@ tracks/1/keys = {
 "method": &"block_animations"
 }, {
 "args": [],
-"method": &"trigger_light_attack"
+"method": &"trigger_heavy_attack"
 }, {
 "args": [],
 "method": &"unblock_animations"
@@ -346,7 +346,7 @@ tracks/1/keys = {
 "method": &"block_animations"
 }, {
 "args": [],
-"method": &"trigger_light_attack"
+"method": &"trigger_heavy_attack"
 }, {
 "args": [],
 "method": &"unblock_animations"
@@ -469,7 +469,7 @@ tracks/1/keys = {
 "method": &"block_animations"
 }, {
 "args": [],
-"method": &"trigger_light_attack"
+"method": &"trigger_heavy_attack"
 }, {
 "args": [],
 "method": &"unblock_animations"
@@ -580,7 +580,7 @@ tracks/1/keys = {
 "method": &"block_animations"
 }, {
 "args": [],
-"method": &"trigger_light_attack"
+"method": &"trigger_heavy_attack"
 }, {
 "args": [],
 "method": &"unblock_animations"

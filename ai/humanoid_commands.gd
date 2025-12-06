@@ -3,101 +3,40 @@ class_name HumanoidCommands
 const STEP_DISTANCE = 36
 
 
-## Have character walk to a random location near the patrol point.
-static func wander_patrol(
-	target_position: Vector2,
-	walk_distance: float,
-	fan_angle: float,
-	pause_time: float,
-) -> Array[Callable]:
-	return [
-		func(ai_controller: AiController):
-			ai_controller.wait(pause_time)
-			return AiConstants.EndConditions.WAITED,
-		func(ai_controller: AiController):
-			# Walk randomly around target position.
-			var angle_to_patrol_point = (target_position - ai_controller.character.position).angle()
-			var half_fan_angle = fan_angle / 2
-			var direction = randf_range(-half_fan_angle, half_fan_angle) + angle_to_patrol_point
-			(
-				ai_controller
-				. move_to(
-					(
-						VectorMath
-						. extend(
-							ai_controller.character.position,
-							walk_distance,
-							direction,
-						)
-					),
-					'walk',
-				)
-			)
-			return AiConstants.EndConditions.DESTINATION_REACHED,
-	]
-
-
-## Close in on the target, from an angle that can be attacked from.
-static func rush(
+static func approach(
 	target: AiTarget,
-	abs_main_offset: float,
-	secondary_offset: float
+	distance: float,
+	move_type: String,
 ) -> Callable:
-	return func(ai_controller: AiController):
-		var target_position = target.position
-
-		var vector_of_approach = VectorMath.calc_face_direction(
-			ai_controller.character.position - target_position)
-
-		match vector_of_approach:
-			Vector2.UP:
-				target_position += Vector2(secondary_offset, -abs_main_offset)
-			Vector2.DOWN:
-				target_position += Vector2(secondary_offset, abs_main_offset)
-			Vector2.RIGHT:
-				target_position += Vector2(abs_main_offset, secondary_offset)
-			Vector2.LEFT:
-				target_position += Vector2(-abs_main_offset, secondary_offset)
-
+	return func (ai_controller: AiController):
+		var current_position = ai_controller.character.position
+		var angle_of_approach = (target.position - current_position).angle()
 		ai_controller.move_to(
-			target_position,
-			'run'
+			VectorMath.extend(
+				current_position,
+				distance,
+				angle_of_approach,
+			),
+			move_type,
 		)
 
-		#_run_to(ai_target.position + Vector2(10, 10))
 		return AiConstants.EndConditions.DESTINATION_REACHED
 
 
 # Checks if the target is in range and only strikes if they are.
 # Requires directional sense on the character.
-static func careful_strike(target: AiTarget) -> Callable:
+static func careful_strike(target: AiTarget, strike_type: String) -> Callable:
 	return func(ai_controller: AiController):
 		var sense = ai_controller.character.attack_sense
 		if sense:
 			var direction = sense.where_target(target.controller)
 			if direction:
 				ai_controller.character.turn(direction)
-				ai_controller.character.act('light_attack')
+				ai_controller.character.act(strike_type)
 				return AiConstants.EndConditions.ACTION_COMPLETED
 
 		ai_controller.go_next()
 		return AiConstants.EndConditions.SKIPPED
-
-
-static func stalk(target: AiTarget, distance: float):
-	return func (ai_controller: AiController):
-		var target_position = VectorMath.extend(
-			ai_controller.character.position,
-			distance,
-			target.move_direction.angle()
-		)
-
-		ai_controller.move_to(
-			target_position,
-			'walk'
-		)
-
-		return AiConstants.EndConditions.DESTINATION_REACHED
 
 
 static func circle(
@@ -137,3 +76,112 @@ static func circle(
 
 	assert(steps == len(result))
 	return result
+
+
+static func evade_strike(
+	ai_controller: AiController,
+	target: AiTarget,
+	evade_distance: float,
+	strike_type: String,
+) -> Array[Callable]:
+	# Calculate before hand. The command should be 'atomic'.
+	var current_position = ai_controller.character.position
+	var vector_of_approach = VectorMath.calc_face_direction(
+		current_position - target.position)
+
+	return [
+		func (_ac):
+			ai_controller.move_to(
+				current_position + (vector_of_approach * evade_distance),
+				'run'
+			)
+
+			return AiConstants.EndConditions.DESTINATION_REACHED,
+
+		func (_ac):
+			ai_controller.character.turn(vector_of_approach * -1)
+			ai_controller.character.act(strike_type)
+
+			return AiConstants.EndConditions.ACTION_COMPLETED
+	]
+
+
+## Close in on the target, from an angle that can be attacked from.
+static func rush(
+	target: AiTarget,
+	abs_main_offset: float,
+	secondary_offset: float
+) -> Callable:
+	return func(ai_controller: AiController):
+		var target_position = target.position
+
+		var vector_of_approach = VectorMath.calc_face_direction(
+			ai_controller.character.position - target_position)
+
+		match vector_of_approach:
+			Vector2.UP:
+				target_position += Vector2(secondary_offset, -abs_main_offset)
+			Vector2.DOWN:
+				target_position += Vector2(secondary_offset, abs_main_offset)
+			Vector2.RIGHT:
+				target_position += Vector2(abs_main_offset, secondary_offset)
+			Vector2.LEFT:
+				target_position += Vector2(-abs_main_offset, secondary_offset)
+
+		ai_controller.move_to(
+			target_position,
+			'run'
+		)
+
+		#_run_to(ai_target.position + Vector2(10, 10))
+		return AiConstants.EndConditions.DESTINATION_REACHED
+
+
+static func stalk(target: AiTarget, distance: float):
+	return func (ai_controller: AiController):
+		var target_position = VectorMath.extend(
+			ai_controller.character.position,
+			distance,
+			target.move_direction.angle()
+		)
+
+		ai_controller.move_to(
+			target_position,
+			'walk'
+		)
+
+		return AiConstants.EndConditions.DESTINATION_REACHED
+
+
+## Have character walk to a random location near the patrol point.
+static func wander_patrol(
+	target_position: Vector2,
+	walk_distance: float,
+	fan_angle: float,
+	pause_time: float,
+) -> Array[Callable]:
+	return [
+		func(ai_controller: AiController):
+			ai_controller.wait(pause_time)
+			return AiConstants.EndConditions.WAITED,
+		func(ai_controller: AiController):
+			# Walk randomly around target position.
+			var angle_to_patrol_point = (target_position - ai_controller.character.position).angle()
+			var half_fan_angle = fan_angle / 2
+			var direction = randf_range(-half_fan_angle, half_fan_angle) + angle_to_patrol_point
+			(
+				ai_controller
+				. move_to(
+					(
+						VectorMath
+						. extend(
+							ai_controller.character.position,
+							walk_distance,
+							direction,
+						)
+					),
+					'walk',
+				)
+			)
+			return AiConstants.EndConditions.DESTINATION_REACHED,
+	]

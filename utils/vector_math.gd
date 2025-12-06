@@ -58,6 +58,7 @@ static func calc_face_direction(vector: Vector2, name = false) -> Variant:
 
 static func relative_movement(
 	check_condition: int,
+	parallel_threshold: float,
 	a_position: Vector2,
 	b_position: Vector2,
 	a_velocity: Vector2,
@@ -67,11 +68,11 @@ static func relative_movement(
 	var relative_position = a_position - b_position
 
 	match relative_velocity.dot(relative_position):
+		var d when (abs(d) <= (parallel_threshold / 2)) and check_condition & RelativeMovement.Parallel:
+			return true
 		var d when d > 0 and check_condition & RelativeMovement.Away:
 			return true
 		var d when d < 0 and check_condition & RelativeMovement.Toward:
-			return true
-		var d when d == 0 and check_condition & RelativeMovement.Parallel:
 			return true
 		_:
 			return false
