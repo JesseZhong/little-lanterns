@@ -57,7 +57,7 @@ static func calc_face_direction(vector: Vector2, name = false) -> Variant:
 
 
 static func relative_movement(
-	check_condition: RelativeMovement,
+	check_condition: int,
 	a_position: Vector2,
 	b_position: Vector2,
 	a_velocity: Vector2,

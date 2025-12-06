@@ -29,3 +29,7 @@ static func decide(...options):
 
 	if result >= 0:
 		(options[result][1] as Callable).call()
+
+
+static func coin_flip() -> bool:
+	return bool(roundi(_instance._rng.randf()))
