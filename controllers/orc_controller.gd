@@ -15,6 +15,8 @@ static var _hits_modifier_rng = NormalDistRange.new(0.5, 0.015, 0.4, 0.6)
 static var _damage_modifier_rng = NormalDistRange.new(0.6, 0.018, 0.5, 0.7)
 static var _walk_distance_rng = NormalDistRange.new(54, 3.2, 40, 65)
 static var _approach_distance_rng = NormalDistRange.new(12, 0.58, 9, 15)
+static var _approach_side_variance_rng = NormalDistRange.new(0, 1.5, -7, 7)
+static var _circle_distance_rng = NormalDistRange.new(32, 2.1, 25, 40)
 static var _idle_interval_rng = NormalDistRange.new(1.7, 0.26, 0, 3.0)
 var _patrol_target: Vector2
 
@@ -92,8 +94,24 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 	if !_queue.has_commands:
 		RNG.decide(
 			[
-				10.0,
-				func(): _queue.do(HumanoidCommands.circle(self, ai_target.position, 200, true, 'run'))
+				0.5,
+				func(): _queue.do(HumanoidCommands.circle(
+					self,
+					ai_target.position,
+					_circle_distance_rng.value,
+					true,
+					'run'
+				))
 			],
-			[2.0, func(): _queue.do(HumanoidCommands.careful_strike(ai_target))]
+			[
+				2.0,
+				func(): _queue.do([
+					HumanoidCommands.rush(
+						ai_target,
+						_approach_distance_rng.value,
+						_approach_side_variance_rng.value
+					),
+					HumanoidCommands.careful_strike(ai_target)
+				])
+			]
 		)

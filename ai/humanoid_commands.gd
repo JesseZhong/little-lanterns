@@ -40,12 +40,32 @@ static func wander_patrol(
 ## Close in on the target, from an angle that can be attacked from.
 static func rush(
 	target: AiTarget,
-	offset: Vector2,
+	abs_main_offset: float,
+	secondary_offset: float
 ) -> Callable:
 	return func(ai_controller: AiController):
-		var angle_of_approach = target.position - ai_controller.character.position
+		var target_position = target.position
 
-	#_run_to(ai_target.position + Vector2(10, 10))
+		var vector_of_approach = VectorMath.calc_face_direction(
+			ai_controller.character.position - target_position)
+
+		match vector_of_approach:
+			Vector2.UP:
+				target_position += Vector2(secondary_offset, -abs_main_offset)
+			Vector2.DOWN:
+				target_position += Vector2(secondary_offset, abs_main_offset)
+			Vector2.RIGHT:
+				target_position += Vector2(abs_main_offset, secondary_offset)
+			Vector2.LEFT:
+				target_position += Vector2(-abs_main_offset, secondary_offset)
+
+		ai_controller.move_to(
+			target_position,
+			'run'
+		)
+
+		#_run_to(ai_target.position + Vector2(10, 10))
+		return AiConstants.EndConditions.DESTINATION_REACHED
 
 
 # Checks if the target is in range and only strikes if they are.

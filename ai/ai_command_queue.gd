@@ -116,6 +116,10 @@ func _execute(command: Callable):
 	# Emit that a command has started execution.
 	command_executed.emit()
 
+	# If the command calls for a skip, skip to the end.
+	if _end_condition == AiConstants.EndConditions.SKIPPED:
+		_finish()
+
 
 func _finish():
 	_executing = false
