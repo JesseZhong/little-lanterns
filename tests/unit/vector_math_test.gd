@@ -30,16 +30,45 @@ var calc_face_direction_params = (
 	)
 )
 
-var relative_movement_params = (
-	ParameterFactory
-	. named_parameters(
-		['check_condition', 'parallel_threshold', 'a_position', 'b_position', 'a_velocity', 'b_velocity', 'expected_result'],
+var relative_movement_params = ParameterFactory.named_parameters(
+	[
+		'check_condition',
+		'parallel_threshold',
+		'a_position',
+		'b_position',
+		'a_velocity',
+		'b_velocity',
+		'expected_result'
+	],
+	[
 		[
-			[VectorMath.RelativeMovement.Away, 0, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, true],
-			[VectorMath.RelativeMovement.Away | VectorMath.RelativeMovement.Parallel, 0, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, true],
-			[VectorMath.RelativeMovement.Toward | VectorMath.RelativeMovement.Parallel, 0, Vector2(22, 0), Vector2(40, 0), Vector2(2, 0), Vector2.ZERO, false]
+			VectorMath.RelativeMovement.AWAY,
+			0,
+			Vector2(22, 0),
+			Vector2(40, 0),
+			Vector2(2, 0),
+			Vector2.ZERO,
+			true
+		],
+		[
+			VectorMath.RelativeMovement.AWAY | VectorMath.RelativeMovement.PARALLEL,
+			0,
+			Vector2(22, 0),
+			Vector2(40, 0),
+			Vector2(2, 0),
+			Vector2.ZERO,
+			true
+		],
+		[
+			VectorMath.RelativeMovement.TOWARD | VectorMath.RelativeMovement.PARALLEL,
+			0,
+			Vector2(22, 0),
+			Vector2(40, 0),
+			Vector2(2, 0),
+			Vector2.ZERO,
+			false
 		]
-	)
+	]
 )
 
 
@@ -58,13 +87,16 @@ func test_assert_calc_face_direction(params = use_parameters(calc_face_direction
 
 
 func test_relative_movement(params = use_parameters(relative_movement_params)):
-	var result = VectorMath.relative_movement(
-		params.check_condition,
-		params.parallel_threshold,
-		params.a_position,
-		params.b_position,
-		params.a_velocity,
-		params.b_position,
+	var result = (
+		VectorMath
+		. relative_movement(
+			params.check_condition,
+			params.parallel_threshold,
+			params.a_position,
+			params.b_position,
+			params.a_velocity,
+			params.b_position,
+		)
 	)
 
 	assert_eq(result, params.expected_result)

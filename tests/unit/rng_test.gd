@@ -1,6 +1,5 @@
 extends GutTest
 
-
 var _random_number_generator: RandomNumberGenerator
 
 
@@ -19,16 +18,7 @@ func test_decide__first_selected():
 	var callback_1 = partial_double(Callback).new()
 	var callback_2 = partial_double(Callback).new()
 
-	RNG.decide(
-		[
-			0.2,
-			callback_1.method
-		],
-		[
-			12.0,
-			callback_2.method
-		]
-	)
+	RNG.decide([0.2, callback_1.method], [12.0, callback_2.method])
 
 	assert_called(_random_number_generator, 'rand_weighted', [[0.2, 12.0]])
 	assert_called(callback_1.method)

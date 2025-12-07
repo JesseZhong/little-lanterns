@@ -56,8 +56,7 @@ func _ready() -> void:
 
 	# When collided, stop any in progress movement.
 	_character.collided.connect(
-		func():
-			_queue.try_finish(AiConstants.EndConditions.DESTINATION_REACHED)
+		func(): _queue.try_finish(AiConstants.EndConditions.DESTINATION_REACHED)
 	)
 
 	# When a command finishes, try to execute the next.

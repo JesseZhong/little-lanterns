@@ -1,11 +1,10 @@
 class_name VectorMath
 extends RefCounted
 
-
 enum RelativeMovement {
-	Toward = 0x1,
-	Away = 0x2,
-	Parallel = 0x4,
+	TOWARD = 0x1,
+	AWAY = 0x2,
+	PARALLEL = 0x4,
 }
 
 
@@ -68,11 +67,13 @@ static func relative_movement(
 	var relative_position = a_position - b_position
 
 	match relative_velocity.dot(relative_position):
-		var d when (abs(d) <= (parallel_threshold / 2)) and check_condition & RelativeMovement.Parallel:
+		var d when (
+			(abs(d) <= (parallel_threshold / 2)) and check_condition & RelativeMovement.PARALLEL
+		):
 			return true
-		var d when d > 0 and check_condition & RelativeMovement.Away:
+		var d when d > 0 and check_condition & RelativeMovement.AWAY:
 			return true
-		var d when d < 0 and check_condition & RelativeMovement.Toward:
+		var d when d < 0 and check_condition & RelativeMovement.TOWARD:
 			return true
 		_:
 			return false
