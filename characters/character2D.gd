@@ -88,8 +88,8 @@ func _process(_delta: float) -> void:
 				_get_hit()
 			'light_attack':
 				_light_attack()
-			_:
-				if not _process_additional_actions(_queued_action):
+			var a:
+				if not _process_additional_actions(a):
 					_idle()
 
 		# Set as current.
