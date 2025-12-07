@@ -54,11 +54,6 @@ func _ready() -> void:
 	# When hit, forget what was planned next.
 	_character.get_hit.connect(func(_origin): _reset())
 
-	# When collided, stop any in progress movement.
-	_character.collided.connect(
-		func(): _queue.try_finish(AiConstants.EndConditions.DESTINATION_REACHED)
-	)
-
 	# When a command finishes, try to execute the next.
 	_queue.command_finished.connect(_queue.execute)
 

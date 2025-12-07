@@ -52,7 +52,8 @@ var _attack_sense: DirectionalSenseArea
 func _ready() -> void:
 	_anim_player = $AnimationPlayer
 	_attack_area = $AttackArea
-	_attack_sense = $DirectionalSenseArea
+	if has_node(^'./DirectionalSenseArea'):
+		_attack_sense = $DirectionalSenseArea
 
 	assert(_anim_player, 'Invalid animation player for character.')
 

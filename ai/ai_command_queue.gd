@@ -1,4 +1,5 @@
 ## Manages AI commands to be executed.
+## Threadsafe.
 class_name AiCommandQueue
 extends RefCounted
 
@@ -17,6 +18,7 @@ var _queue: Array = []
 var _ai_controller: AiController
 var _executing: bool = false
 var _end_condition: AiConstants.EndConditions
+var _mutex: Mutex = Mutex.new()
 
 
 func _init(ai_controller: AiController) -> void:
@@ -27,19 +29,24 @@ func _init(ai_controller: AiController) -> void:
 ## as long as no previous one still executing.
 ## Returns whether a new command was executed or not.
 func execute() -> bool:
+	_mutex.lock()
 	if has_commands and !_executing:
 		var command: Callable = _queue.pop_front()
 		if command:
 			_execute(command)
+			_mutex.unlock()
 			return true
 
+	_mutex.unlock()
 	return false
 
 
 ## Clears the command queue and current executing.
 func reset():
+	_mutex.lock()
 	_queue.clear()
 	_executing = false
+	_mutex.unlock()
 
 
 ## Attempt to queue and execute command(s).
@@ -55,6 +62,7 @@ func do(command_s: Variant, now = false) -> void:
 		'Argument must be a command or list of commands.'
 	)
 
+	_mutex.lock()
 	if command_s is Callable:
 		var single = command_s as Callable
 
@@ -84,12 +92,14 @@ func do(command_s: Variant, now = false) -> void:
 
 		# Throw the rest into the queue.
 		_queue.append_array(list)
+	_mutex.unlock()
 
 
 ## Attempts to stop any executing command by passing an end condition.
 ## If the condition matches the one required by an executing command,
 ## the command is resolved and a signal is emitted.
 func try_finish(end_condition: AiConstants.EndConditions) -> bool:
+	_mutex.lock()
 	if (
 		_executing
 		and (
@@ -98,13 +108,18 @@ func try_finish(end_condition: AiConstants.EndConditions) -> bool:
 		)
 	):
 		_finish()
+		_mutex.unlock()
 		return true
+
+	_mutex.unlock()
 	return false
 
 
 func force_finish():
+	_mutex.lock()
 	if _executing:
 		_finish()
+	_mutex.unlock()
 
 
 func _execute(command: Callable):
