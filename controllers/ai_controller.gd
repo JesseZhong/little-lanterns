@@ -7,6 +7,14 @@ const DEFAULT_WAIT_TIME = 0.1
 
 static var _normal_distributed_range_rng_collection: Dictionary[String, NormalDistRange] = {}
 
+@export_subgroup('debug')
+@export var debug_agent = false:
+	set(value):
+		if _agent:
+			_agent.debug_enabled = value
+
+@export var debug_ai = false
+
 var nav_agent: NavigationAgent2D:
 	get:
 		return _agent
@@ -46,9 +54,11 @@ func _ready() -> void:
 	# When hit, forget what was planned next.
 	_character.get_hit.connect(func(_origin): _reset())
 
-	# When collided, stop, clear action queue,
-	# and force the AI to reassess the situation.
-	_character.collided.connect(_reset)
+	# When collided, stop any in progress movement.
+	_character.collided.connect(
+		func():
+			_queue.try_finish(AiConstants.EndConditions.DESTINATION_REACHED)
+	)
 
 	# When a command finishes, try to execute the next.
 	_queue.command_finished.connect(_queue.execute)
@@ -135,6 +145,7 @@ func setup(own_character: Character2D, own_condition: CharacterCondition, ...arg
 	_agent.set_avoidance_mask_value(Collision.Layers.ABILITIES, true)
 	_agent.set_avoidance_mask_value(Collision.Layers.TERRAIN, false)
 	_agent.navigation_layers = Collision.Layers.TERRAIN
+	_agent.target_desired_distance = 1.0
 
 	# Setup the command queue.
 	_queue = AiCommandQueue.new(self)
@@ -143,7 +154,7 @@ func setup(own_character: Character2D, own_condition: CharacterCondition, ...arg
 	_attention.first_target_entered.connect(_reset)
 	_attention.last_target_exited.connect(_reset)
 
-	_agent.debug_enabled = true
+	_agent.debug_enabled = debug_agent
 
 
 func move_to(

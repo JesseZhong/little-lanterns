@@ -7,6 +7,10 @@ const ATTENTION = {
 
 const PARALLEL_THRESHOLD = 0.12
 
+## To prevent AI from over committing to a path,
+## rush over small distances and reassess.
+const RUSH_DISTANCE = 23
+
 var _patrol_target: Vector2
 
 static func _static_init():
@@ -33,6 +37,7 @@ static func _static_init():
 		'atk: circling distance' = [32, 2.1, 25, 40],
 		'atk: threat distance' = [24, 0.8, 20, 28],
 		'atk: evade distance' = [22, 1.15, 16, 27],
+		'atk: pause time' = [2, 0.5, 0, 4.5],
 
 		# Watch/assess.
 		'w: stalking distance' = [37, 5.8, 20, 60],
@@ -104,7 +109,9 @@ func _weigh_target(key: NodePath, data: AiTarget, delta_since: float) -> void:
 func _idle():
 	_queue.do(
 		HumanoidCommands.wander_patrol(
-			_patrol_target, d('i: walk distance'), PI * 0.7, d('i: pause time')
+			_patrol_target,
+			d('i: walk distance'), PI * 0.7, d('i: pause time'),
+			debug_ai,
 		)
 	)
 
@@ -117,8 +124,9 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 		if distance > ATTENTION.low_att_dist:
 			_queue.do(HumanoidCommands.approach(
 				ai_target,
-				distance - ATTENTION.low_att_dist,
-				'run'
+				RUSH_DISTANCE,
+				'run',
+				debug_ai,
 			))
 
 		# Target is walking away, try to walk parallel or circle.
@@ -131,20 +139,29 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 		):
 			RNG.decide(
 				[
+					0.3,
+					func (): _queue.do(HumanoidCommands.pause(
+						d('atk: pause time'),
+						debug_ai,
+					))
+				],
+				[
 					0.5,
 					func (): _queue.do(HumanoidCommands.circle(
 						self,
 						ai_target.position,
 						d('w: circling distance'),
 						RNG.coin_flip(),
-						'walk'
+						'walk',
+						debug_ai,
 					))
 				],
 				[
-					0.5,
+					0.2,
 					func (): _queue.do(HumanoidCommands.stalk(
 						ai_target,
-						d('w: stalking distance')
+						d('w: stalking distance'),
+						debug_ai,
 					))
 				]
 			)
@@ -165,7 +182,8 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 						self,
 						ai_target,
 						d('atk: evade distance'),
-						'light_attack' if RNG.coin_flip() else 'heavy_attack'
+						'light_attack' if RNG.coin_flip() else 'heavy_attack',
+						debug_ai,
 					))
 				],
 				[
@@ -173,6 +191,7 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 					func (): _queue.do(HumanoidCommands.careful_strike(
 						ai_target,
 						'heavy_strike',
+						debug_ai,
 					))
 				]
 			)
@@ -187,7 +206,8 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 						ai_target.position,
 						d('atk: circling distance'),
 						RNG.coin_flip(),
-						'run'
+						'run',
+						debug_ai,
 					))
 				],
 				[
@@ -196,12 +216,14 @@ func _engage_target(ai_target: AiTarget, _delta: float) -> void:
 						HumanoidCommands.rush(
 							ai_target,
 							d('atk: approach distance'),
-							d('atk: approach side variance')
+							d('atk: approach side variance'),
+							debug_ai,
 						),
 						HumanoidCommands.careful_strike(
 							ai_target,
-							'light_attack' if RNG.coin_flip() else 'heavy_attack'
-						)
+							'light_attack' if RNG.coin_flip() else 'heavy_attack',
+							debug_ai,
+						),
 					])
 				]
 			)
