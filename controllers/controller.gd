@@ -22,6 +22,9 @@ func _ready() -> void:
 	y_sort_enabled = true
 
 
-func setup(own_character: Character2D, own_condition: CharacterCondition, ..._args) -> void:
+func setup(
+	own_character: Character2D,
+	own_condition: CharacterCondition,
+) -> void:
 	_character = own_character
 	_condition = own_condition

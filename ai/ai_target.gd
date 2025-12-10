@@ -23,11 +23,11 @@ var condition: CharacterCondition:
 ## The world position of this target.
 var position: Vector2:
 	get:
-		return controller.character.position
+		return _controller.character.position
 
 var move_direction: Vector2:
 	get:
-		return controller.character.movement_direction
+		return _controller.character.direction
 
 ## Amount of hits taken from this target.
 var hits_taken: int = 0

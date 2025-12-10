@@ -8,24 +8,12 @@ const DEFAULT_WAIT_TIME = 0.1
 static var _normal_distributed_range_rng_collection: Dictionary[String, NormalDistRange] = {}
 
 @export_subgroup('debug')
-@export var debug_agent = false:
-	set(value):
-		if _agent:
-			_agent.debug_enabled = value
-
 @export var debug_ai = false
-
-var nav_agent: NavigationAgent2D:
-	get:
-		return _agent
 
 var waiting: bool:
 	get:
 		return _wait_time > 0
 
-var _move_type: String = ''
-var _agent: NavigationAgent2D
-var _stop_pathing: bool = false
 var _wait_time: float = 0
 var _attention: AiAttention
 var _current_target: Variant  # "nullable" NodePath
@@ -34,6 +22,9 @@ var _queue: AiCommandQueue
 
 func _ready() -> void:
 	super._ready()
+
+	# Ensure attention has been set prior.
+	assert(_attention, 'Attention needs to be set in AI controller.')
 
 	# Try to signal when an action command is completed.
 
@@ -44,7 +35,7 @@ func _ready() -> void:
 	)
 
 	# For when pathing finishes.
-	_agent.navigation_finished.connect(
+	_character.nav_agent.navigation_finished.connect(
 		func(): _queue.try_finish(AiConstants.EndConditions.DESTINATION_REACHED)
 	)
 
@@ -82,24 +73,6 @@ func _process(delta: float) -> void:
 			_current_target = null
 
 
-func _physics_process(_delta: float) -> void:
-	if not _agent:
-		return
-
-	# Do not query when the map has never synchronized and is empty.
-	if NavigationServer2D.map_get_iteration_id(_agent.get_navigation_map()) == 0:
-		return
-
-	# Stop moving once the destination is reached
-	# and attempt to execute the next command.
-	if _agent.is_navigation_finished() or _stop_pathing:
-		_character.stop_moving()
-		return
-
-	# Continue pointing the character towards the destination.
-	_character.act(_move_type, _character.position.direction_to(_agent.get_next_path_position()))
-
-
 ## Populates the normal distribution range collection with values.
 static func load_normal_dists(collection: Dictionary[String, Array]) -> void:
 	for n in collection:
@@ -114,32 +87,11 @@ static func d(distribution_name: String) -> float:
 	return dist.value if dist else 0.0
 
 
-func setup(own_character: Character2D, own_condition: CharacterCondition, ...args) -> void:
+func setup(
+	own_character: Character2D,
+	own_condition: CharacterCondition,
+) -> void:
 	super.setup(own_character, own_condition)
-	assert(len(args) >= 3, 'AI controller setup requires at least 5 arguments.')
-
-	assert(
-		args[0] is float and args[1] is float,
-		'AI controller setup requires valid attention radius values.'
-	)
-	_attention = (
-		AiAttention
-		. new(
-			own_character,
-			args[0],
-			args[1],
-			faction,
-		)
-	)
-
-	assert(args[2] is NavigationAgent2D, 'AI controller setup requires a valid navigation agent.')
-	_agent = args[2] as NavigationAgent2D
-	_agent.avoidance_layers = Collision.Layers.CHARACTER_LOWER
-	_agent.set_avoidance_mask_value(Collision.Layers.CHARACTER_LOWER, true)
-	_agent.set_avoidance_mask_value(Collision.Layers.ABILITIES, true)
-	_agent.set_avoidance_mask_value(Collision.Layers.TERRAIN, false)
-	_agent.navigation_layers = Collision.Layers.TERRAIN
-	_agent.target_desired_distance = 1.0
 
 	# Setup the command queue.
 	_queue = AiCommandQueue.new(self)
@@ -148,21 +100,22 @@ func setup(own_character: Character2D, own_condition: CharacterCondition, ...arg
 	_attention.first_target_entered.connect(_reset)
 	_attention.last_target_exited.connect(_reset)
 
-	_agent.debug_enabled = debug_agent
-
 
 func move_to(
 	target_position: Vector2,
 	move_type: String,
+	move_power: float = 0.0,
 ) -> void:
-	_stop_pathing = false
-	_move_type = move_type
-	_agent.target_position = target_position
+	_character.act(
+		move_type,
+		Vector2.ZERO,
+		move_power,
+		target_position,
+	)
 
 
 # Forces character to idly wait for a certain amount of time.
 func wait(wait_time: float = DEFAULT_WAIT_TIME) -> void:
-	_stop_pathing = true
 	_wait_time = wait_time
 	_character.act('idle')
 
@@ -181,10 +134,10 @@ func _advance_time(delta: float) -> void:
 			done_waiting.emit()
 
 
+## Reset the command queue and currently executing commands.
 func _reset():
 	_queue.reset()
 	_queue.try_finish(AiConstants.EndConditions.INTERRUPTED)
-	_stop_pathing = true
 	_wait_time = 0
 
 

@@ -17,32 +17,32 @@ func _ready() -> void:
 		self, Vector2(320, 120), 'orc', CharacterStats.new(400, 67, 1.2, 43), {'faction': 'orcs'}
 	)
 
-# monster_spawner.spawn(
-#   self,
-#   Vector2(310, 70),
-#   'orc',
-#   CharacterStats.new(
-#     450,
-#     86,
-#     1.1,
-#     48
-#   ),
-#   {
-#     'faction': 'orcs'
-#   }
-# )
+	monster_spawner.spawn(
+		self,
+		Vector2(310, 70),
+		'orc',
+		CharacterStats.new(
+			450,
+			72,
+			1.1,
+			48
+		),
+		{
+			'faction': 'orcs'
+		}
+	)
 
-# monster_spawner.spawn(
-#   self,
-#   Vector2(334, 54),
-#   'orc',
-#   CharacterStats.new(
-#     430,
-#     82,
-#     1.21,
-#     41
-#   ),
-#   {
-#     'faction': 'orcs'
-#   }
-# )
+	monster_spawner.spawn(
+		self,
+		Vector2(334, 54),
+		'orc',
+		CharacterStats.new(
+			430,
+			65,
+			1.21,
+			41
+		),
+		{
+			'faction': 'orcs'
+		}
+	)

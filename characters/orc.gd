@@ -10,6 +10,18 @@ func _ready() -> void:
 	super._ready()
 
 
+## Add handling for heavy attack.
+func _process_action(action: String) -> bool:
+	if super._process_action(action):
+		return true
+
+	match action:
+		'heavy_attack':
+			_move_power = 0.0
+			return true
+	return false
+
+
 func trigger_light_attack() -> void:
 	if _attack_area:
 		_attack_area.trigger_effect(
@@ -26,13 +38,3 @@ func trigger_heavy_attack() -> void:
 				var damage = _character_condition.attack.value * _heavy_attack_modifier_rng.value
 				target.condition.current_hp -= damage
 		)
-
-
-func _process_additional_actions(action: String) -> bool:
-	match action:
-		'heavy_attack':
-			_move_direction = Vector2.ZERO
-			_smooth_play('heavy_attack_%s' % _face_direction)
-			return true
-		_:
-			return false

@@ -49,25 +49,23 @@ func _ready() -> void:
 	super._ready()
 
 
-func setup(own_character: Character2D, own_condition: CharacterCondition, ...args):
-	# Variadic arguments currently don't have a spread operator
-	# to compliment it. The workaround is to use `callv` to pass
-	# the arguments. Unfortunately, this is the only way to
-	# convert a base/super method into a callable.
-	# See: https://docs.godotengine.org/en/stable/tutorials/scripting/gdscript/gdscript_basics.html#variadic-functions
-	var base_setup = func(params):
-		(
-			super
-			. setup(
-				own_character,
-				own_condition,
-				# Create the monitoring areas.
+func setup(
+	own_character: Character2D,
+	own_condition: CharacterCondition,
+) -> void:
+	_attention = (
+		AiAttention
+		. new(
+			own_character,
 				d('att: scan range'),
 				d('att: attention range'),
-				params,
-			)
+			faction,
 		)
-	base_setup.callv(args)
+	)
+
+	# AI controller requires attention to be set first.
+	super.setup(own_character, own_condition)
+	
 	_patrol_target = own_character.position
 
 
