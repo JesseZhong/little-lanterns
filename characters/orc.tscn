@@ -2360,7 +2360,6 @@ polygon = PackedVector2Array(7, 4, 15, 11, 22, 11, 22, -13, 15, -13, 7, -4)
 [node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
 target_desired_distance = 1.0
 avoidance_enabled = true
-radius = 17.0
-debug_enabled = true
+radius = 7.2
 
 [editable path="DirectionalSenseArea"]

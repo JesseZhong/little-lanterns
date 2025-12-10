@@ -134,7 +134,6 @@ func _physics_process(delta: float) -> void:
 		# Also, stop moving once the destination is reached or determined to be unreachable.
 		if NavigationServer2D.map_get_iteration_id(_nav_agent.get_navigation_map()) == 0 \
 			or _nav_agent.is_navigation_finished():
-			_move_power = 0.0
 			_direction = Vector2.ZERO
 
 		# Otherwise, overwrite the current movement direction.

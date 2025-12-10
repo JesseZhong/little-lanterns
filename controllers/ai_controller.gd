@@ -104,7 +104,7 @@ func setup(
 func move_to(
 	target_position: Vector2,
 	move_type: String,
-	move_power: float = 0.0,
+	move_power: float = 1.0,
 ) -> void:
 	_character.act(
 		move_type,

@@ -1,4 +1,4 @@
-extends Character2D
+extends TerrestrialCharacter
 
 # TODO: Create passive skill that hones attacks, narrowing deviation.
 # Blood effect. Varying effect levels based off severity. Crit is maxish value.
