@@ -89,7 +89,11 @@ func _ready() -> void:
 
 	# When a non-looping animation ends,
 	# attempt to reset the animation idle, run, or walk.
-	_anim_player.animation_finished.connect(func(_anim_name): action_ended.emit(current_action))
+	_anim_player.animation_finished.connect(
+		func(_anim_name):
+			action_ended.emit(current_action)
+			_current_action = 'idle'
+	)
 
 	# Handle movement when using avoidance.
 	_nav_agent.velocity_computed.connect(_on_velocity_computed)
@@ -98,14 +102,27 @@ func _ready() -> void:
 	_nav_agent.navigation_finished.connect(func (): _nav_movement = false)
 
 
-## Handle the execution of actions and animations.
+## Handle animations.
 func _process(_delta: float) -> void:
-	# Reset speed.
-	_anim_player.speed_scale = 1.0
+	
+	# Play animations according to state.
+	if _anim_player:
+		
+		# Update animation using the final calculated face direction.
+		_smooth_play('%s_%s' % [_current_action, _face_direction])
+
+
+## Handle actions, navigation, physics, and movement.
+## See: https://docs.godotengine.org/en/stable/tutorials/physics/interpolation/using_physics_interpolation.html#move-almost-all-game-logic-from-process-to-physics-process
+func _physics_process(delta: float) -> void:
 
 	# Determine the animation based off the
 	# intended action and if animations are blocked.
 	if _queued_action:
+
+		# Reset speed.
+		_anim_player.speed_scale = 1.0
+
 		_process_action(_queued_action)
 
 		# Set as current.
@@ -113,19 +130,6 @@ func _process(_delta: float) -> void:
 
 		# Reset queued action.
 		_queued_action = null
-
-	# Play animations according to state.
-	if _anim_player:
-		
-		# Update animation using the final calculated face direction.
-		_smooth_play('%s_%s' % [_current_action, _face_direction])
-
-		# For getting hit, attempt to reset to idle after.
-		if _current_action == 'get_hit':
-			_anim_player.queue('idle')
-
-
-func _physics_process(delta: float) -> void:
 
 	# If navigation movement is indicated, derive the the movement
 	# direction based off the current position in the path.
@@ -264,6 +268,7 @@ func _smooth_play(animation_name: String):
 ## If the character has super armor, shrug off hit.
 func _on_get_hit(origin_position: Vector2) -> void:
 	if not _character_condition.has_super_armor:
-		# NOTE: Getting hit takes precedent over everything else and ignore animation blocks.
+		# NOTE: Getting hit takes precedent over everything else and ignores animation blocks.
 		_queued_action = 'get_hit'
-		_face_direction = VectorMath.calc_face_direction(origin_position - global_position, true)
+		_direction = VectorMath.calc_face_direction(origin_position - global_position)
+		_move_power = 0.0

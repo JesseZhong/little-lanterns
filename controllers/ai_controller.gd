@@ -49,7 +49,7 @@ func _ready() -> void:
 	_queue.command_finished.connect(_queue.execute)
 
 
-func _process(delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	_advance_time(delta)
 
 	# No targets? Do your own thang.
