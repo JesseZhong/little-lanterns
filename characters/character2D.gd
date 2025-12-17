@@ -59,6 +59,7 @@ var _face_direction: String = 'down'
 var _character_condition: CharacterCondition
 
 var _queued_action: Variant
+var _queued_direction: Vector2 = Vector2.ZERO
 var _current_action: String = 'idle'
 
 var _move_power: float = 0.0
@@ -127,6 +128,7 @@ func _physics_process(delta: float) -> void:
 
 		# Set as current.
 		_current_action = _queued_action
+		_direction = _queued_direction
 
 		# Reset queued action.
 		_queued_action = null
@@ -189,7 +191,7 @@ func act(
 ) -> void:
 	if !_block_anim and _queued_action != 'get_hit':
 		_queued_action = action
-		_direction = intended_direction
+		_queued_direction = intended_direction
 		_move_power = clamp(move_power, 0, 1)
 
 		assert(
@@ -203,7 +205,7 @@ func act(
 
 ## Stop movement but not animation.
 func stop_moving():
-	_direction = Vector2.ZERO
+	_move_power = 0.0
 
 
 ## Turns the character to face a certain direction.

@@ -50,8 +50,7 @@ static func careful_strike(
 					debug,
 					'careful strike: turn toward %s and striking with %s' % [direction, strike_type]
 				)
-				ai_controller.character.turn(direction)
-				ai_controller.character.act(strike_type)
+				ai_controller.character.act(strike_type, direction)
 				return AiConstants.EndConditions.ACTION_COMPLETED
 
 		_debug(debug, 'careful strike: go next')
