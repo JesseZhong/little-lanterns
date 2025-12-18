@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cijveuwpq2r53"]
+
+[ext_resource type="Shader" uid="uid://b5wpqym4vjrr1" path="res://shaders/color_fill.gdshader" id="1_xinnb"]
+
+[resource]
+resource_local_to_scene = true
+shader = ExtResource("1_xinnb")
+shader_parameter/active = false
+shader_parameter/tint = Color(1, 1, 1, 1)
