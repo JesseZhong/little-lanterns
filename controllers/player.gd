@@ -18,14 +18,15 @@ func _physics_process(_delta: float) -> void:
 
 		var action: String = 'idle'
 		var move_power: float = 0.0
-		if direction_length > 0:
-			if Input.is_action_pressed('light_attack'):
-				action = 'light_attack'
-			elif Input.is_action_pressed('heavy_attack'):
-				action = 'heavy_attack'
-			elif Input.is_action_pressed('charge_attack'):
-				action = 'charge_attack'
-			elif Input.is_action_pressed('run'):
+
+		if Input.is_action_pressed('light_attack'):
+			action = 'light_attack'
+		elif Input.is_action_pressed('heavy_attack'):
+			action = 'heavy_attack'
+		elif Input.is_action_pressed('charge_attack'):
+			action = 'charge_attack'
+		elif direction_length > 0:
+			if Input.is_action_pressed('run'):
 				action = 'run'
 				move_power = direction_length
 			else:

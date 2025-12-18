@@ -128,7 +128,8 @@ func _physics_process(delta: float) -> void:
 
 		# Set as current.
 		_current_action = _queued_action
-		_direction = _queued_direction
+		if _queued_direction != Vector2.ZERO:
+			_direction = _queued_direction
 
 		# Reset queued action.
 		_queued_action = null
